@@ -1,0 +1,19 @@
+# Tile Server
+
+Tile servers on Geobase are automatically generated whenever a table is created with a `geometry` column or when a postgres function is created with the following signature:
+
+```sql
+CREATE OR REPLACE FUNCTION public.get_tiles(
+	z integer,
+	x integer,
+	y integer
+)
+RETURNS bytea
+LANGUAGE plpgsql
+AS $function$
+DECLARE
+BEGIN
+	RETURN NULL;
+END;
+$function$
+```

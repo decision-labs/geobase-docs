@@ -1,15 +1,20 @@
 {
-  "index": "Introduction",
-  "another": "Another Page",
-  "advanced": "Advanced (A Folder)",
-  "about": {
-    "title": "About",
-    "type": "page"
-  },
-  "contact": {
-    "title": "Contact ↗",
-    "type": "page",
-    "href": "https://twitter.com/shuding_",
-    "newWindow": true
-  }
+	"index": "Getting Started",
+	"blueprints": "Blueprints",
+	"guides": "Guides",
+	"examples": "Examples",
+	"tileserver": "Tile Server",
+	"supabase": "Supabase Docs",
+	"signup": {
+		"title": "Sign Up ↗",
+		"type": "page",
+		"href": "https://geobase.app/",
+		"newWindow": true
+	},
+	"blog": {
+		"title": "Blog ↗",
+		"type": "page",
+		"href": "https://geobase.app/blog",
+		"newWindow": true
+	}
 }
