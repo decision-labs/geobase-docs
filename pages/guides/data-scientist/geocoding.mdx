@@ -1,0 +1,68 @@
+# Geocoding and Reverse Geocoding with geobase using Python
+
+Geocoding and reverse geocoding are essential techniques in geographical information systems (GIS). Geocoding converts addresses into geographic coordinates (latitude and longitude), while reverse geocoding converts geographic coordinates back into a human-readable address. In this blog, we'll explore how to perform both tasks using Python and store the results in a geobase database.
+
+## Prerequisites
+
+Before we begin, ensure you have the following requirements fullfilled:
+
+- `db_connection_string` :  can be found in your project settings.
+
+## Creating connection with geobase
+Navigate to "Project Settings" then copy the connection string user tab "URI" in Connection Portion, then connection will be created with geobase using "geopy"
+```python copy
+connection_string = "postgresql://username:password@serveraddress:port/database"
+conn = psycopg2.connect(connection_string)
+```
+
+## Geocoding Addresses
+We will use the "geopy" library to geocode addresses into latitude and longitude. Here's a Python function to achieve this:
+
+```python copy
+import psycopg2
+from geopy.geocoders import Nominatim
+
+def geocode_address(address):
+    geolocator = Nominatim(user_agent="geoencoder")
+    location = geolocator.geocode(address)
+    if location:
+        return location.latitude, location.longitude
+    else:
+        return None, None
+```
+
+## Reverse Geocoding Addresses
+We can also reverse geocode latitude and longitude to get an address. Here’s how you can do it using geopy:
+
+```python copy
+def reverse_geocode(lat, lon):
+    geolocator = Nominatim(user_agent="geoencoder")
+    location = geolocator.reverse((lat, lon), exactly_one=True)
+    if location:
+        return location.address
+    else:
+        return None
+```
+
+## Storing Geocoded Data in geobase
+Next, we insert the geocoded data into the geobase table.
+
+```python copy
+def insert_location(address, latitude, longitude):
+    try:
+        cur = conn.cursor()
+        
+        # Insert data into locations table
+        cur.execute(f"""
+            INSERT INTO geocoding_demo (address, latitude, longitude, geom) 
+            VALUES ('{address}', {latitude}, {longitude}, ST_SetSRID(ST_MakePoint({longitude}, {latitude}), 4326))
+        """)
+        conn.commit()
+        cur.close()
+        print(f"Inserted: {address} -> ({latitude}, {longitude})")
+    except Exception as e:
+        print(f"Failed to insert data: {e}")
+```
+
+The resultanl table will look like this:
+![geocoding_demo](./images/geocoding_demo.png)

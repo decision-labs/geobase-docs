@@ -1,0 +1,72 @@
+# Basics of Reading and Writing from GeoBase in GeoParquet
+
+## Introduction
+
+This guide will walk you through the process of loading GeoParquet files into a GeoPandas DataFrame and saving them to a "GeoBase" database. Additionally, it will cover how to read data from "GeoBase" and save it back to a GeoParquet file.
+
+## Prerequisites
+
+Ensure you have the following libraries installed:
+
+- `geopandas`
+- `sqlalchemy`
+- `geoalchemy2`
+
+You can install any missing libraries using pip:
+
+```bash
+pip install geopandas sqlalchemy geoalchemy2
+```
+## Cloning the GeoParquet Repository
+First, clone the GeoParquet repository to obtain the example parquet file.
+```sh
+!git clone https://github.com/opengeospatial/geoparquet.git
+```
+## Writing GeoParquet to GeoBase
+To load a GeoParquet file into a GeoPandas object, use the `geopandas.read_parquet` function. Then, save the GeoPandas object to GeoBase using the `geopandas.to_postgis` function.
+
+#### Define the Path to Your GeoParquet File
+```python
+geoparquet_file = '/content/geoparquet/examples/example.parquet'
+```
+
+#### Read the GeoParquet File into a `GeoDataFrame`
+```python
+import geopandas as gpd
+
+gdf = gpd.read_parquet(geoparquet_file)
+gdf.head()
+```
+
+#### Define the Connection String for Your geobase Database
+```python
+from sqlalchemy import create_engine
+
+db_connection_string = "postgresql://username:password@hostaddress.geobase.app:port/database"
+engine = create_engine(db_connection_string)
+```
+
+#### Load the `GeoDataFrame` into geobase
+```python
+gdf.to_postgis(name="geoParquet_test", con=engine, if_exists='replace')
+```
+![geoparquet_test](./images/geoparquet_test.png)
+## Reading from GeoBase and Saving as GeoParquet
+Data can be loaded from GeoBase and saved as GeoParquet by following the steps below:
+
+- Load data from GeoBase as a `GeoDataFrame`
+- Save data as GeoParquet by calling the `to_parquet` method
+
+#### Read Data from GeoBase
+```python
+sql = """
+SELECT * FROM parks
+"""
+df = gpd.read_postgis(sql, con=engine, geom_col="location")
+```
+
+#### Save Data as GeoParquet
+```python
+df.to_parquet("example.parquet")
+```
+The file with a `.parquet` extension will be saved in the desired directory.

@@ -1,0 +1,60 @@
+# Basics of reading and writing from geobase in geopandas
+
+This guide demonstrates how to work with geospatial data using pandas, geopandas, and SQLAlchemy, and how to interact with a "geobase" database. Follow the steps below to replicate the process.
+
+## Import Libraries and Install Required Packages
+
+First, import the necessary libraries:
+```python copy
+import pandas as pd
+import geopandas
+from sqlalchemy import create_engine
+
+pd.options.display.max_rows = 100
+pd.options.display.max_columns = 300
+```
+
+Install geoalchemy2 for working with geospatial data in SQL databases:
+```sh copy
+pip install geoalchemy2
+```
+
+## Download and Extract Geospatial Data
+Download the Natural Earth dataset for countries and extract the files:
+```sh copy
+!wget https://naciscdn.org/naturalearth/10m/cultural/ne_10m_admin_0_countries.zip
+!unzip ./content/ne_10m_admin_0_countries.zip
+```
+
+## Load Geospatial Data
+Load the extracted shapefile into a GeoDataFrame:
+```python copy
+countries = geopandas.read_file("./content/ne_10m_admin_0_countries.shp")
+```
+
+## Database Connection
+Set up the connection to the geobase database using SQLAlchemy:
+
+```python copy
+db_connection_url = "postgresql://username:password@hostaddress.geobase.app:port/database"
+con = create_engine(db_connection_url)
+```
+![connection string](./images/connection_string.png)
+
+## Writing Data to Database
+Write the GeoDataFrame to the geobase database:
+```python copy
+countries.to_postgis("countries_test", con, if_exists="replace")
+```
+
+## Reading Data from Database
+Read geospatial data from the database:
+```sql
+sql = """
+SELECT * FROM parks
+"""
+
+df = geopandas.read_postgis(sql, con, geom_col="location")
+```
+![countries_test](./images/countries_test.png)
+
