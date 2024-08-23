@@ -1,10 +1,31 @@
 # How does Geobase Postgres access MotherDuck
 
+import { Callout } from 'nextra/components'
+
+In his guide we will get you started with MotherDuck and how to access it from Geobase Postgres. By the end of it you will be able to:
+1. Run SQL queries on MotherDuck from within Geobase 
+2. Query data stored in MotherDuck via Geobase's REST API from frontend applications
+3. Visualise data stored in MotherDuck using Geobase's Map Tile Server
+
+By the end you will have the following running:
+
+![Geobase](./_duckdb_fdw/08-geobase-motherduck-view.gif)
+
+<Callout type="info" emoji="ℹ️">
+  **Note:** This guide is meant to be followed in the order presented.
+</Callout>
+
+
+## What is MotherDuck? 
+
+> skip if you already know
+
+> TLD;R MotherDuck is a cloud-based analytics service built on top of DuckDB.
+
 ![](./_duckdb_fdw/01-arch.png)
 
-## What is MotherDuck?
+MotherDuck is a cloud-based analytics service built on top of DuckDB. DuckDB is an open-source embedded OLAP database developed and maintained by the DuckDB community and DuckDB Labs. MotherDuck is an independent organization closely collaborating with DuckDB Labs to build a cloud-based analytics platform based on DuckDB.
 
-MotherDuck is a cloud-based analytics service built on top of DuckDB. DuckDB is a free and open-source embedded OLAP database developed and maintained by the DuckDB community and DuckDB Labs. MotherDuck is an independent organization closely collaborating with DuckDB Labs to build a cloud-based analytics platform based on DuckDB.
 Some features of MotherDuck include:
 
 -   Cloud database storage: Manage your DuckDB database directories in the cloud for easy scalability and collaboration.
@@ -18,47 +39,97 @@ MotherDuck is suitable for data applications that don't require petabyte-scale d
 
 ## Preparation
 
+> TLD;R: Get a MotherDuck account and a service token.
+
 First you need to have a MotherDuck account register MotherDuck is currently free to use, visit the Sign Up page, Choose a method you like to register an account. Then go to settings page to get your service token.
 
 ![](./_duckdb_fdw/02-service-token.png)
 
-## Enable duckdb_fdw in geobase
+## Enable `duckdb_fdw` in geobase
 
-In geobase go to Database > Extensions > duckdb_fdw and "Enable" the extension.
+
+In geobase go to `Database > Extensions > duckdb_fdw` and toggle the switch to "Enable" the extension.
 
 ![](./_duckdb_fdw/03-geobase-enable-duckdb_fdw.gif)
 
-## Create a foreign server
+## Create foreign data wrapper server
 
-In geobase go to SQL Editor and run the following SQL to create a foreign server.
+In geobase go to SQL Editor and run the following SQL to create a foreign server. 
+
+
+<Callout type="info" emoji="ℹ️">
+  **Note:** Replace `YOUR_MOTHERDUCK_TOKEN` in the SQL with the service token copied earlier.
+</Callout>
 
 ```sql
-DROP EXTENSION if exists duckdb_fdw CASCADE;
-CREATE EXTENSION IF NOT EXISTS duckdb_fdw; WITH SCHEMA extensions CASCADE;
+-- Clean up (optional)
+-- DROP EXTENSION if exists duckdb_fdw CASCADE;
+-- CREATE EXTENSION IF NOT EXISTS duckdb_fdw; WITH SCHEMA extensions CASCADE;
 
-CREATE SERVER DuckDB_server FOREIGN DATA WRAPPER duckdb_fdw
-OPTIONS (database 'md:?motherduck_token=<motherduck_token>&saas_mode=true');
+-- Create the foreign server
+DO $$
+DECLARE
+  motherduck_token TEXT;
+BEGIN
+  -- Assign the value of the configuration setting to the variable
+  motherduck_token := 'YOUR_MOTHERDUCK_TOKEN';
+
+  -- Check if the token matches the JWT pattern
+  IF NOT (motherduck_token ~ '^[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+$') THEN
+    RAISE EXCEPTION 'motherduck_token variable is not set. Please replace YOUR_MOTHERDUCK_TOKEN with a valid value';
+  END IF;
+
+  -- Create the foreign server using the token
+  EXECUTE format(
+    'CREATE SERVER duckdb_server FOREIGN DATA WRAPPER duckdb_fdw OPTIONS (database ''md:?motherduck_token=%s&saas_mode=true'')',
+    motherduck_token
+  );
+END $$;
 ```
 
-Replace `<motherduck_token>` with the service token copied earlier.
+<Callout type="default" emoji="🎉">
+  Woho! You have successfully created a foreign server for MotherDuck. Which means you can run queries on the MotherDuck from with-in geobase! 🚀
+</Callout>
+
+
+## Run SQL on MotherDuck
 
 Create a view for easy inspection of which databases and tables are in motherduck.
 
 ```sql
-SELECT duckdb_execute('duckdb_server', 'create view tables_duckdb as SELECT * FROM information_schema.tables');
-IMPORT FOREIGN SCHEMA public FROM SERVER DuckDB_server INTO public;
+-- execute sql on duckdb server hosted by motherduck to create a view
+SELECT duckdb_execute('duckdb_server',
+  'CREATE VIEW IF NOT EXISTS tables_duckdb AS SELECT * FROM information_schema.tables'
+);
+```
+
+Now we can import the view we just created into geobase and query it.
+
+```sql
+-- import tables and views from motherduck public shcema into public schema on geobase
+IMPORT FOREIGN SCHEMA public FROM SERVER duckdb_server INTO public;
+
+
+-- query the view we just created on motherduck
 SELECT * FROM tables_duckdb;
 ```
 
-Suppose now I want to import all Schema tables in the database `sample_data` in MotherDuck to geobase.
+MotherDuck tables are now visible in geobase. 🎉
+
+## Import from other motherduck databases
+
+> TLD;R: Import tables from other databases in MotherDuck.
+
+MotherDuck comes preloaded with some sample data. This is stored in the `sample_data` database. Suppose now I want to import all tables in the database `sample_data` in MotherDuck to geobase. For this we need to update the search path to include the `sample_data` database and the we can import the tables from the `sample_data` database which are in various schemas.
 
 ```sql
+-- on motherduck set the search path to the schema you want to import
 SELECT duckdb_execute('duckdb_server','set search_path TO ''sample_data,my_db'';');
+-- 
 IMPORT FOREIGN SCHEMA nyc  FROM SERVER DuckDB_server INTO public;
 IMPORT FOREIGN SCHEMA hn   FROM SERVER DuckDB_server INTO public;
 IMPORT FOREIGN SCHEMA who  FROM SERVER DuckDB_server INTO public;
-SELECT *  FROM information_schema.tables
-  WHERE table_schema='public' AND table_type='FOREIGN';
+SELECT *  FROM information_schema.tables WHERE table_schema='public' AND table_type='FOREIGN';
 ```
 
 ![Query Schema](./_duckdb_fdw/05-query-schema.png)
@@ -85,24 +156,34 @@ ORDER BY count DESC
 LIMIT 20;
 ```
 
-NOTE: Postgres does not have a `regexp_extract` function and needs to be replaced by `regexp_matches`.
+<Callout type="info" emoji="ℹ️">
+  **Note:** PostgreSQL does not have a `regexp_extract` function and needs to be replaced by `regexp_matches`.
+</Callout>
 
 ![Query Result](./_duckdb_fdw/06-query-table.png)
 
-## Uploading data to MotherDuck
+## Upload data to MotherDuck
 
 We are going to upload the `chicago_crime_dataset_pa.parquet` table to MotherDuck. File can be downloaded from [here](./_duckdb_fdw/chicago_crime_dataset_pa.parquet).
 
-For this on the MotherDuck UI, click on the `ADD FILES` button to upload a new dataset. Afterward click on the three dots on the right of the dataset and select `Share`. This will present the following dialog.
+For this on the MotherDuck UI, click on the `ADD FILES` button to upload a new dataset. This will create a cell with SQL to import the dataset. Run the cell to import the dataset.
 
-![Share Dataset](./_duckdb_fdw/07-share-database.png) Copy the `Share URL` and use it to create a foreign table in geobase.
+![Upload Dataset](./_duckdb_fdw/import-chicago_crime_dataset_pa.png)
+
+
 
 ```sql
-SELECT duckdb_execute('duckdb_server','ATTACH ''md:_share/my_db/a80d0419-41cb-4ac6-8131-910ea2c07515'' as md_share ;');
-SELECT duckdb_execute('duckdb_server','set search_path TO ''md_share,sample_data,my_db'';');
-IMPORT FOREIGN SCHEMA public LIMIT TO(chicago_crime_dataset_pa) FROM SERVER DuckDB_server INTO public;
+IMPORT FOREIGN SCHEMA public LIMIT TO(chicago_crime_dataset_pa) FROM SERVER duckdb_server INTO public;
 SELECT * FROM chicago_crime_dataset_pa LIMIT 5;
 ```
+
+## Map Visualization
+
+
+For us to visualise the data on a map we need to create a view with a PostGIS column. This allows geobase to automatically detect the geometry column and create an end point for the map tile server.
+
+
+### Create a view with a PostGIS column
 
 Next let's create a view with a postgis column.
 
@@ -122,6 +203,23 @@ FROM chicago_crime_dataset_pa
 LIMIT 100;
 ```
 
+### Fronted Map via Tile Server
+
+Now we can access the data via the Geobase Map Tile Server. 
+
 ![Geobase](./_duckdb_fdw/08-geobase-motherduck-view.gif)
+
+## Query via REST API
+
+You can also use the REST API to query the data stored in MotherDuck. 
+
+```bash
+# TEST API
+curl 'https://[GEOBASE_PROJECT_ID].geobase.app/rest/v1/chicago_crime_data_view' \
+  -H "apikey: [GEOBASE_ANON_KEY]" \
+  -H "Authorization: Bearer [GEOBASE_ANON_KEY]"
+```
+
+## Conclusion
 
 Build something amazing with MotherDuck and Geobase! 🐥🚀
