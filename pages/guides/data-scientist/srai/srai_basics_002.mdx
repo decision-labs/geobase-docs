@@ -7,13 +7,21 @@ This tutorial demonstrates how to create hex2vec embeddings for geospatial data 
 
 The Hex2Vec embedder is designed to generate embeddings for hexagonally partitioned geographical regions. These embeddings capture the spatial relationships and the characteristics of the features present within those regions.
 
-### Why These Parameters Are Required
-- regions and features: These provide the core data needed for embedding. Without regions, the model wouldn't know the spatial boundaries, and without features, there wouldn't be any attributes to encode.
-- joint: This ensures that the embedding process has a complete dataset where each region is associated with its features, maintaining data integrity.
-- neighbourhood: Spatial relationships are crucial for meaningful embeddings. Hexagons are influenced by their neighbors, so understanding these relationships is key to capturing the spatial structure.
+## How are geospatial embeddings created?
 
-### Flow Diagram of whole process of creating embeddings.
+The creation of geospatial embeddings involves several steps:
+1. select a geographical area of interest
+2. load OpenStreetMap (OSM) data for that area
+3. regionalize the area into hexagonal regions
+4. join the regions with the OSM features
+5. create embeddings for the regions based on the features
+6. store the embeddings in a geobase database
+
+This is a high-level overview of the process:
+
 ![Hex2Vec Embedder Flow Diagram](./images/pipeline.png)
+
+In the rest of this tutorial, we will walk through each of these steps in detail.
 
 ## Installing Required Packages
 
@@ -71,7 +79,7 @@ regions = regionalizer.transform(area)
 ```
 
 ## Load Features
-Using the loader, we load the features from OSM within the specified area. The HEX2VEC_FILTER ensures that only relevant features for the Hex2Vec model are loaded.
+Using the loader, we load the features from OSM within the specified area. The `HEX2VEC_FILTER` ensures that only relevant features for the Hex2Vec model are loaded.
 ```python
 features = loader.load(area, HEX2VEC_FILTER)
 ```

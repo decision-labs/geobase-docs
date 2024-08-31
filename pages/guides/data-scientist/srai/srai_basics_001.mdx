@@ -1,10 +1,31 @@
 # Creating Embeddings and Storing in Geobase
 
-This tutorial demonstrates how to create embeddings for geospatial data using OpenStreetMap (OSM) and store them in a geobase database. We will use the following Python libraries: `srai`, `geopandas`, and `sqlalchemy`.
+This tutorial demonstrates how to create geospatial embeddings with data from OpenStreetMap (OSM) and store them in your geobase project database. We will use the following Python libraries: `srai`, `geopandas`, and `sqlalchemy`.
+
+## What are Geospatial Embeddings?
+
+Geospatial embeddings are vector representations of geographical regions that capture the spatial relationships and characteristics of the features present within those regions. These embeddings can be used for various geospatial analysis tasks, such as clustering, classification, and visualization.
+
+## How are geospatial embeddings created?
+
+The creation of geospatial embeddings involves several steps:
+1. select a geographical area of interest
+2. load OpenStreetMap (OSM) data for that area
+3. regionalize the area into hexagonal regions
+4. join the regions with the OSM features
+5. create embeddings for the regions based on the features
+6. store the embeddings in a geobase database
+
+This is a high-level overview of the process:
+
+![Hex2Vec Embedder Flow Diagram](./images/pipeline.png)
+
+In the rest of this tutorial, we will walk through each of these steps in detail.
+
 
 ## Import Necessary Libraries
 
-```
+```python
 from srai.embedders import CountEmbedder
 from srai.joiners import IntersectionJoiner
 from srai.loaders import OSMOnlineLoader
@@ -24,7 +45,8 @@ Install geoalchemy2 for working with geospatial data in SQL databases:
 
 - Load OSM Data: Use OSMOnlineLoader to load features for a specific area and query.
 - Regionalize Data: Use H3Regionalizer to divide the area into hexagonal regions.
-```
+
+```python 
 loader = OSMOnlineLoader()
 regionalizer = H3Regionalizer(resolution=9)
 joiner = IntersectionJoiner()
@@ -39,7 +61,8 @@ joint = joiner.transform(regions, features)
 
 ## Create Embeddings
 Use `CountEmbedder` to create embeddings for the regions based on the loaded features.
-```
+
+```python
 embedder = CountEmbedder()
 embeddings = embedder.transform(regions, features, joint)
 ```
@@ -47,7 +70,7 @@ embeddings = embedder.transform(regions, features, joint)
 ## Visualize the Results
 Use `srai.plotting` to visualize the regions and the embeddings.
 
-```
+```python
 folium_map = plot_regions(area, colormap=["rgba(0,0,0,0.1)"], tiles_style="CartoDB positron")
 plot_numeric_data(regions, "amenity_bicycle_parking", embeddings, map=folium_map)
 
@@ -61,10 +84,30 @@ For this you will need to have an account with [https://geobase.app](https://geo
 - Define the Table Schema: Define the metadata and table structure.
 - Store Data: Use the to_postgis method to store the GeoDataFrame in the geobase.
 
-```
+```python
 # Create a connection to the database
 engine = create_engine('postgresql://username:password@host_address:port/database')
+```
 
+We need to create the pgvector extension in the database before storing the embeddings.
+
+```python
+add_pgvector_extension = """
+BEGIN;
+CREATE EXTENSION IF NOT EXISTS pgvector WITH SCHEMA extensions;
+COMMIT;
+"""
+
+with engine.connect() as connection:
+    connection.execute(text(add_pgvector_extension))
+    connection.commit()
+```
+
+You can also do it via the geobase studio dashboard by going to the `Database > Extensions` tab and enabling the `pgvector` extension.
+
+![](./images/enable-pgvector-studio.gif)
+
+```python
 # Example of DataFrame structure
 embeddings_df = pd.DataFrame({
     'region': regions['geometry'],  # Assuming regions DataFrame contains geometries
@@ -92,7 +135,6 @@ embeddings_gdf.to_postgis('malmo_embeddings', engine, if_exists='replace')
 
 # Verify data storage
 gdf = gpd.read_postgis("malmo_embeddings", engine, geom_col='region')
-
 ```
 
 ![Malmo Bicycle Parking Embeddings](./images/malmo_embeddings.png)
