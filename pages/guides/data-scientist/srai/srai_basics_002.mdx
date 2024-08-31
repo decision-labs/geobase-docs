@@ -135,7 +135,7 @@ COMMIT;
 
 with engine.connect() as connection:
     connection.execute(text(create_table_sql))
-
+    connection.commit()
 ```
 Now we can save embeddings into database in two ways:
 - using sqlalchemy insert command 
@@ -163,6 +163,7 @@ for _, row in embeddings_gdf.iterrows():
 with engine.connect() as conn:
     with conn.begin():
         conn.execute(insert(malmo_embeddings), records)
+        conn.commit()
 ```
 
 - `Metadata`: Holds information about the database tables.
