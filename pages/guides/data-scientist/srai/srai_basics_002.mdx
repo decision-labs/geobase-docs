@@ -1,3 +1,4 @@
+import { Callout } from "nextra/components";
 
 # Creating Multidimensional Embeddings for Geospatial Data with Hex2Vec and Storing in Geobase
 
@@ -10,6 +11,7 @@ The Hex2Vec embedder is designed to generate embeddings for hexagonally partitio
 ## How are geospatial embeddings created?
 
 The creation of geospatial embeddings involves several steps:
+
 1. select a geographical area of interest
 2. load OpenStreetMap (OSM) data for that area
 3. regionalize the area into hexagonal regions
@@ -52,6 +54,7 @@ import numpy as np
 - `geoalchemy2`: Extends SQLAlchemy to support geospatial data types.
 
 ## Import Necessary SRAI Libraries
+
 ```python
 from srai.embedders import Hex2VecEmbedder
 from srai.joiners import IntersectionJoiner
@@ -61,15 +64,16 @@ from srai.neighbourhoods.h3_neighbourhood import H3Neighbourhood
 from srai.regionalizers import H3Regionalizer, geocode_to_region_gdf
 from srai.plotting import plot_regions, plot_numeric_data
 ```
+
 - OSMPbfLoader: Loads OSM data for a specified area.
 - H3Regionalizer: Converts geographical areas into H3 hexagons at a specific resolution.
 - IntersectionJoiner: Joins geospatial regions with OSM features.
-
 
 ## Load OSM Data and Regionalize
 
 - Load OSM Data: Use OSMOnlineLoader to load features for a specific area and query.
 - Regionalize Data: We use the `H3Regionalizer` to divide the area of interest into hexagonal regions. The H3 indexing system is a hierarchical hexagonal grid system that is useful for spatial analysis.
+
 ```python
 loader = OSMPbfLoader()
 regionalizer = H3Regionalizer(resolution=11)
@@ -79,32 +83,43 @@ regions = regionalizer.transform(area)
 ```
 
 ## Load Features
+
 Using the loader, we load the features from OSM within the specified area. The `HEX2VEC_FILTER` ensures that only relevant features for the Hex2Vec model are loaded.
+
 ```python
 features = loader.load(area, HEX2VEC_FILTER)
 ```
 
 ## Initialize the Joiner
+
 The IntersectionJoiner is used to join the spatial features with the defined regions. This step ensures that each region has associated feature data for embedding.
+
 ```python
 joiner = IntersectionJoiner()
 ```
 
 ## Join Regions and Features
+
 The joiner transforms the regions and features into a joint representation, necessary for embedding.
+
 ```python
 joint = joiner.transform(regions, features)
 ```
+
 ![Joint Representation](./images/features.png)
 
 ## Define the Neighbourhood
+
 We define the spatial neighbourhood using the H3Neighbourhood class, which will help the embedder understand spatial relationships.
+
 ```python
 neighbourhood = H3Neighbourhood(regions_gdf=regions)
 ```
 
 ## Initialize, Fit and Transform Embedder
+
 We fit the embedder to the regions, features, joint representation, and neighbourhood. This step trains the model to create meaningful embeddings.
+
 ```python
 embedder = Hex2VecEmbedder()
 embedder = Hex2VecEmbedder([15, 10, 3])
@@ -113,8 +128,8 @@ embedder.fit(regions, features, joint, neighbourhood, batch_size=128)
 embeddings = embedder.transform(regions, features, joint)
 ```
 
-
 ## Visualize the Results
+
 Use `srai.plotting` to visualize the regions and the embeddings.
 
 ```python
@@ -122,13 +137,75 @@ folium_map = plot_regions(area, colormap=["rgba(0,0,0,0.1)"], tiles_style="Carto
 plot_numeric_data(regions, 0, embeddings, map=folium_map)
 
 ```
+
 ![Embeddings Visualization](./images/visualization.png)
 
-
 ## Saving Embeddings to Geobase
+
 - Create a Connection to the Database: Use sqlalchemy to create an engine for the geobase database.
 - Prepare Data for Storage: Convert the embeddings to a DataFrame and then to a GeoDataFrame.
 - Define the Table Schema: Define the metadata and table structure.
+
+<Callout type="info" emoji="ℹ️">
+  **Note:** The pgvector extension must be enabled in the Geobase project to
+  support vector data types.
+</Callout>
+
+Here is how you can enable the pgvector extension in Geobase:
+![Enable pgvector Extension](./images/pgvector_extension_enable.gif)
+
+### Create a Connection to the Database
+
+As a first step, create a connection to the geobase database using sqlalchemy.
+
+To copy the connection string from the Geobase project, navigate to the project settings.
+![Geobase Connection String](./images/connection_string.gif)
+
+Import database connection details from environment variables.
+
+```python
+from google.colab import userdata
+db_string = userdata.get('db_string')
+```
+
+Or you can import using the .env file
+
+```python
+from dotenv import load_dotenv
+load_dotenv()
+import os
+db_string = os.getenv('DB_STRING')
+```
+
+Create an engine using the connection string.
+
+```python
+# Create a connection to the database
+engine = create_engine(db_string)
+```
+
+<Callout type="info" emoji="ℹ️">
+  **Note:** The connection string should be in the format:
+  `postgresql://username:password@host:port/database`
+</Callout>
+
+To check if the connection is successful, you can use the following code:
+
+```python
+try:
+    connection = engine.connect()
+    print("Connection to the database successful!")
+    connection.close()
+except Exception as e:
+    print("Connection failed:", e)
+```
+
+<Callout type="info" emoji="ℹ️">
+  **Note:** While executing any SQL commands you need to start and finish
+  transactions using `BEGIN;` and `COMMIT;` respectively. Or you can use
+  `conn.begin()` and `conn.commit()` methods if you are using a connection
+  object.
+</Callout>
 
 ```python
 create_table_sql = """
@@ -145,11 +222,14 @@ with engine.connect() as connection:
     connection.execute(text(create_table_sql))
     connection.commit()
 ```
+
 Now we can save embeddings into database in two ways:
-- using sqlalchemy insert command 
+
+- using sqlalchemy insert command
 - using pandas to_sql builtin method
 
 ### Using sqlalchemy insert command
+
 ```python
 metadata = MetaData()
 malmo_embeddings = Table(
@@ -179,6 +259,7 @@ with engine.connect() as conn:
 - `insert`: Inserts records into the table.
 
 ### Using pandas to_sql method
+
 ```python
 # Convert 'region' column to WKT format
 embeddings_gdf['region'] = embeddings_gdf['region'].apply(lambda geom: geom.wkt)
@@ -186,9 +267,17 @@ embeddings_gdf['region'] = embeddings_gdf['region'].apply(lambda geom: geom.wkt)
 # Use to_sql to save the data
 embeddings_gdf.to_sql('embeddings_vector', engine, if_exists='append', index=False, dtype={ 'embeddings': ARRAY(Float)})
 ```
+
 ![Geobase Table](./images/database.png)
 
+<Callout type="info" emoji="ℹ️">
+  **Note:** The geopandas methods `to_sql` and `read_postgis` will convert the
+  vector data to a string format when saving or reading from the database. You
+  will need to convert the string back to a list or array when reading the data.
+</Callout>
+
 ## Load embeddings in geoDataframe from geobase
+
 Use the geopandas method `read_postgis` to read data from the `geobase`
 
 ```python
@@ -197,6 +286,7 @@ read_df = gpd.read_postgis(query, engine,geom_col='region')
 ```
 
 ### Verifying and Converting the 'embeddings' Column to a Numeric Vector
+
 ```python
 # Verify if the 'embeddings' column can be converted to a numeric vector
 import ast
@@ -206,5 +296,3 @@ try:
 except Exception as e:
     print(f"Error converting 'embeddings' column: {e}")
 ```
-When reading from a geobase database using `gpd.read_postgis`, non-geometric data types like vectors can be converted into strings because GeoPandas is primarily designed for handling geometries. To use these vectors as numerical data in Python, you need to manually convert the strings back into arrays or lists.
-
