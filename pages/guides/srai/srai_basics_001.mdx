@@ -1,10 +1,10 @@
-# Creating Embeddings and Storing in Geobase
+# Creating and Storing Geo Embeddings in Geobase
 
-This tutorial demonstrates how to create geospatial embeddings with data from OpenStreetMap (OSM) and store them in your geobase project database. We will use the following Python libraries: `srai`, `geopandas`, and `sqlalchemy`.
+This tutorial demonstrates how to create geospatial embeddings with data from OpenStreetMap (OSM) and store them in your geobase project database. We will use the following Python libraries: `srai` (version `0.7.5`), `geopandas`, and `sqlalchemy`.
 
 ## What are Geospatial Embeddings?
 
-Geospatial embeddings are vector representations of geographical regions that capture the spatial relationships and characteristics of the features present within those regions. These embeddings can be used for various geospatial analysis tasks, such as clustering, classification, and visualization.
+Geospatial embeddings are vector representations of geographical regions that capture the spatial relationships and characteristics of the features present within those regions. These embeddings can be used for various applications
 
 ## How are geospatial embeddings created?
 
@@ -22,6 +22,17 @@ This is a high-level overview of the process:
 
 In the rest of this tutorial, we will walk through each of these steps in detail.
 
+
+## Installing Required Packages
+
+To begin, you need to install several Python packages. These packages include libraries for working with geospatial data, embedding models, and Geobase.
+
+```bash
+!pip install srai[all]
+!pip install folium matplotlib mapclassify
+!pip install pgvector
+!pip install geoalchemy2
+```
 
 ## Import Necessary Libraries
 

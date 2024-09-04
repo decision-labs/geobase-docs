@@ -1,3 +1,6 @@
 {
-  "srai": "GeoAI"
+  "getting-started": "Getting Started",
+  "geopandas": "Geopandas",
+  "geoparquet": "Geoparquet",
+  "geocoding": "Geocoding"
 }
