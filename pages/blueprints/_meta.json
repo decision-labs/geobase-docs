@@ -1,3 +1,5 @@
 {
-	"auth": "auth"
+	"shareable-maps-flutter": "Shareable Maps App (Flutter)",
+	"shareable-maps-nextjs": "Shareable Maps App (Next.js)",
+	"movement-analysis-traces": "Movement Traces (React SPA)"
 }

@@ -3,6 +3,12 @@ import { DocsThemeConfig } from "nextra-theme-docs";
 import GeobaseLogo from "./components/geobase-logo";
 
 const config: DocsThemeConfig = {
+	useNextSeoProps() {
+		return {
+			titleTemplate: "%s — Geobase Docs",
+			description: "Find documentation, guides, examples, and blueprints for Geobase.app",
+		};
+	},
 	head: <link rel="icon" type="image/x-icon" href="https://geobase.app/favicon.ico" />,
 	primaryHue: {
 		dark: 152,
