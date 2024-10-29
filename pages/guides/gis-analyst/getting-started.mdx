@@ -11,10 +11,17 @@ This documentation will guide you through setting up **QGIS** with **GeoBase**.
 **QGIS** is a versatile desktop GIS application that supports a wide range of vector and raster formats. It allows users to perform spatial analysis, map production, and geospatial data management.
 To setup QGIS on your system, you can follow the official installation guide: [https://qgis.org/en/site/forusers/download.html](https://qgis.org/en/site/forusers/download.html)
 
-## 2. Connecting with GeoBase
-To connect QGIS with GeoBase, you need to create a new PostgreSQL database connection.
+## 2. Connecting QGIS to GeoBase
+Connecting QGIS to GeoBase is very similar to connecting to PostGress, you need to create a new PostgreSQL database connection.
 
-![qgis_new_connection](./images/qgis_connection.png)
+To connect with GeoBase use the `PostgreSQL` tab in the Browser panel, right-click on the PostgreSQL option to create a `New Connection`.
+
+![geobase_connection](./images/qgis_postgre_connection_dark.png) 
+{/* <picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./images/qgis_connection.png"/>
+  <source media="(prefers-color-scheme: light)" srcset="./images/qgis_connection.png"/>
+  <img alt="GeoBase Connection" srcset="pages/guides/gis-analyst/images/geobase_connection.png"/>
+</picture> */}
 
 The connection details include:
 - **Name**: A name for the connection.
@@ -24,16 +31,17 @@ The connection details include:
 - **Username**: The username to access the database.
 - **Password**: The password for the database user.
 
-These details can be obtained from the GeoBase Project Settings.
+To obtain these connection details, navigate to `GeoBase` and click on `Project Settings` in the left navigation panel. You will find the required information under the `Connection Info`.
 
-![geobase_connection](./images/geobase_connection.png)
+![geobase_connection](./images/geobase_connection_dark.png)
 
-### Visualize Data
+## 3. Loading and Visualize Data from GeoBase into QGIS
 As a GIS analyst, you can visualize spatial data using QGIS. You can load shapefiles, GeoJSON files, and other geospatial data formats into QGIS for analysis and visualization.
 
-Under public in your database you can find the tables that you can visualize in QGIS.
+After connecting QGIS to GeoBase, you can load data from GeoBase into QGIS by clicking `PostgreSQL` in Browser Panel and then selcting your databse.
+To visualize the data, right-click on the table you want to visualize in `public` scheme and select `Add Layer to Project` or you can drag and drop table in `Layers` Panel.
 
-![qgis_visualize_data](./images/qgis_visualize_data.png)
+![qgis_visualize_data](./images/qgis_visualize_data_dark.png)
 
 Now you are ready to start working with QGIS and GeoBase as a GIS analyst.
 The combination of these tools will help you analyze and visualize spatial data effectively.
