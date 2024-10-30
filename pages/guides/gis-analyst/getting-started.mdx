@@ -1,3 +1,5 @@
+import { Steps } from 'nextra/components'
+
 # A Guide to Connecting QGIS and GeoBase for GIS Analysts
 
 ## Introduction
@@ -6,12 +8,13 @@ Geospatial Information Systems (GIS) play a crucial role in analyzing, managing,
 - **QGIS** is an open-source GIS application that allows users to view, edit, and analyze geospatial data.
 
 This documentation will guide you through setting up **QGIS** with **GeoBase**.
-
-## 1. Setting Up QGIS
+<Steps>
+  
+### Setting Up QGIS
 **QGIS** is a versatile desktop GIS application that supports a wide range of vector and raster formats. It allows users to perform spatial analysis, map production, and geospatial data management.
 To setup QGIS on your system, you can follow the official installation guide: [https://qgis.org/en/site/forusers/download.html](https://qgis.org/en/site/forusers/download.html)
 
-## 2. Connecting QGIS to GeoBase
+### Connecting QGIS to GeoBase
 Connecting QGIS to GeoBase is very similar to connecting to PostGress, you need to create a new PostgreSQL database connection.
 
 To connect with GeoBase use the `PostgreSQL` tab in the Browser panel, right-click on the PostgreSQL option to create a `New Connection`.
@@ -35,7 +38,7 @@ To obtain these connection details, navigate to `GeoBase` and click on `Project 
 
 ![geobase_connection](./images/geobase_connection_dark.png)
 
-## 3. Loading and Visualize Data from GeoBase into QGIS
+### Loading and Visualize Data from GeoBase into QGIS
 As a GIS analyst, you can visualize spatial data using QGIS. You can load shapefiles, GeoJSON files, and other geospatial data formats into QGIS for analysis and visualization.
 
 After connecting QGIS to GeoBase, you can load data from GeoBase into QGIS by clicking `PostgreSQL` in Browser Panel and then selcting your databse.
@@ -43,5 +46,6 @@ To visualize the data, right-click on the table you want to visualize in `public
 
 ![qgis_visualize_data](./images/qgis_visualize_data_dark.png)
 
+</Steps>
 Now you are ready to start working with QGIS and GeoBase as a GIS analyst.
 The combination of these tools will help you analyze and visualize spatial data effectively.
