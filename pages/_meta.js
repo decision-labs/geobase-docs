@@ -1,5 +1,6 @@
 export default {
 	"index": "Getting Started",
+	"data-imports": "Data Imports",
 	"blueprints": "Blueprints",
 	"guides": "Guides",
 	"examples": "Examples",
