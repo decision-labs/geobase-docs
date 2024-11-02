@@ -1,8 +1,8 @@
-# Basics of Reading and Writing from GeoBase in GeoParquet
+# Basics of Reading and Writing from Geobase in GeoParquet
 
 ## Introduction
 
-This guide will walk you through the process of loading GeoParquet files into a GeoPandas DataFrame and saving them to a "GeoBase" database. Additionally, it will cover how to read data from "GeoBase" and save it back to a GeoParquet file.
+This guide will walk you through the process of loading GeoParquet files into a GeoPandas DataFrame and saving them to a "Geobase" database. Additionally, it will cover how to read data from "Geobase" and save it back to a GeoParquet file.
 
 ## Prerequisites
 
@@ -22,8 +22,8 @@ First, clone the GeoParquet repository to obtain the example parquet file.
 ```sh
 !git clone https://github.com/opengeospatial/geoparquet.git
 ```
-## Writing GeoParquet to GeoBase
-To load a GeoParquet file into a GeoPandas object, use the `geopandas.read_parquet` function. Then, save the GeoPandas object to GeoBase using the `geopandas.to_postgis` function.
+## Writing GeoParquet to Geobase
+To load a GeoParquet file into a GeoPandas object, use the `geopandas.read_parquet` function. Then, save the GeoPandas object to Geobase using the `geopandas.to_postgis` function.
 
 #### Define the Path to Your GeoParquet File
 ```python
@@ -51,13 +51,13 @@ engine = create_engine(db_connection_string)
 gdf.to_postgis(name="geoParquet_test", con=engine, if_exists='replace')
 ```
 ![geoparquet_test](./images/geoparquet_test.png)
-## Reading from GeoBase and Saving as GeoParquet
-Data can be loaded from GeoBase and saved as GeoParquet by following the steps below:
+## Reading from Geobase and Saving as GeoParquet
+Data can be loaded from Geobase and saved as GeoParquet by following the steps below:
 
-- Load data from GeoBase as a `GeoDataFrame`
+- Load data from Geobase as a `GeoDataFrame`
 - Save data as GeoParquet by calling the `to_parquet` method
 
-#### Read Data from GeoBase
+#### Read Data from Geobase
 ```python
 sql = """
 SELECT * FROM parks
