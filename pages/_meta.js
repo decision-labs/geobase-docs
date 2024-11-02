@@ -1,4 +1,4 @@
-{
+export default {
 	"index": "Getting Started",
 	"blueprints": "Blueprints",
 	"guides": "Guides",

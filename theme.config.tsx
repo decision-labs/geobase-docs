@@ -1,18 +1,21 @@
 import React from "react";
-import { DocsThemeConfig } from "nextra-theme-docs";
 import GeobaseLogo from "./components/geobase-logo";
 
-const config: DocsThemeConfig = {
-	useNextSeoProps() {
-		return {
-			titleTemplate: "%s — Geobase Docs",
-			description: "Find documentation, guides, examples, and blueprints for Geobase.app",
-		};
+const config = {
+	head: ({ title }) => {
+		return (
+			<>
+				<meta name="description" content="Find documentation, guides, examples, and blueprints for Geobase.app" />
+				<title>{title ? `${title} — Geobase Docs` : 'Geobase Docs'}</title>
+				<link rel="icon" type="image/x-icon" href="https://geobase.app/favicon.ico" />
+			</>
+		)
 	},
-	head: <link rel="icon" type="image/x-icon" href="https://geobase.app/favicon.ico" />,
-	primaryHue: {
-		dark: 152,
-		light: 152,
+	color: {
+		hue: {
+			dark: 152,
+			light: 152,
+		},
 	},
 	logo: (
 		<GeobaseLogo
@@ -20,7 +23,7 @@ const config: DocsThemeConfig = {
 				width: "8rem",
 				height: "auto",
 			}}
-		/>
+			/>
 	),
 	project: {
 		link: "https://github.com/decision-labs/geobase",
@@ -30,7 +33,7 @@ const config: DocsThemeConfig = {
 	},
 	docsRepositoryBase: "https://github.com/decision-labs/geobase-docs",
 	footer: {
-		text: `Geobase.app © ${new Date().getFullYear()}`,
+		content: `Geobase.app © ${new Date().getFullYear()}`,
 	},
 };
 

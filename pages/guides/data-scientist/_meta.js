@@ -1,4 +1,4 @@
-{
+export default {
   "getting-started": "Getting Started",
   "geopandas": "Geopandas",
   "geoparquet": "Geoparquet",
