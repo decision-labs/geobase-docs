@@ -1,0 +1,5 @@
+export default {
+	"shareable-maps-nextjs": "Shareable Maps App (Next.js)",
+	// "shareable-maps-flutter": "Shareable Maps App (Flutter)",
+	// "movement-analysis-traces": "Movement Traces (React SPA)"
+}
