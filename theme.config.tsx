@@ -32,6 +32,7 @@ const config = {
 		link: "https://discord.gg/4susZSj4bd",
 	},
 	docsRepositoryBase: "https://github.com/sabman/geobase-docs",
+	defaultShowCopyCode: true,
 	footer: {
 		content: `Geobase.app © ${new Date().getFullYear()}`,
 	},

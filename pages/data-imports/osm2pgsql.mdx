@@ -65,7 +65,8 @@ With your `.osm.pbf` file and database connection details ready, proceed to impo
 1. **Download the Lua Configuration Script**: For 3D building data, download the `3dbuildings.lua` script from [3dbuildings.lua](https://osm2pgsql.org/examples/3dbuildings/3dbuildings.lua).
 
 You can also use `curl` to download the script:
-```bash
+
+```sh
 curl -O https://osm2pgsql.org/examples/3dbuildings/3dbuildings.lua
 ```
 
@@ -75,11 +76,12 @@ curl -O https://osm2pgsql.org/examples/3dbuildings/3dbuildings.lua
 
 2. **Run `osm2pgsql` Command**: Open your terminal and execute the following command, replacing placeholders with your actual details: 
 
-```bash
-osm2pgsql -d postgres -U supabase_admin -H YOUR_PROJECT_REF.geobase.app -P 6443 \
-          --password -O flex -S 3dbuildings.lua your_map.osm.pbf
+```sh
+osm2pgsql -d postgres -U supabase_admin -H YOUR_PROJECT_REF.geobase.app \
+  -P 6443 --password -O flex -S 3dbuildings.lua YOUR_OSM_FILE_PATH.osm.pbf
 ```
-> you will need to replace `YOUR_PROJECT_REF` with your actual project reference and you will be prompted for the database password
+
+> you will need to replace `YOUR_PROJECT_REF` with your actual project reference and you will be prompted for the database password and `YOUR_OSM_FILE_PATH` with the path to your downloaded `.osm.pbf` file.
 
 * `-d`: Database name.
 * `-U`: Database user.
@@ -90,9 +92,9 @@ osm2pgsql -d postgres -U supabase_admin -H YOUR_PROJECT_REF.geobase.app -P 6443 
 * `-S 3dbuildings.lua`: Specifies the Lua configuration script.
 * `your_map.osm.pbf`: Path to your downloaded .osm.pbf file.
 
-<div class="info">
-  <strong>Note:</strong> Ensure the `3dbuildings.lua` script is in your current directory or provide the full path to it.
-</div>
+<Callout type="info" emoji="ℹ️">
+  Ensure the `3dbuildings.lua` script is in your current directory or provide the full path to it.
+</Callout>
 
 ## Step 4: Visualize Data in Geobase
 
@@ -112,9 +114,9 @@ After importing the data:
 
 ![osm2pgsql](https://d2w9rnfcy7mm78.cloudfront.net/31916505/original_15026a7eb3575c1856b70a7b0451a169.png?1730648958?bc=0)
 
-<div class="info">
-  <strong>Tip:</strong> For detailed styling and customization, refer to the [MapLibre documentation](https://maplibre.org/).
-</div>
+<Callout type="info" emoji="ℹ️">
+  For detailed styling and customization, refer to the [MapLibre documentation](https://maplibre.org/).
+</Callout>
 
 ## Additional Resources
 
