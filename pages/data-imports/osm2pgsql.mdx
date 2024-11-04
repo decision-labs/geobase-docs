@@ -1,23 +1,28 @@
+import { Callout } from 'nextra/components';
+
 # Importing OpenStreetMap (OSM) Data into Geobase
 
-In this guide, we’ll walk you through importing OSM data into your Geobase Postgres database using `osm2pgsql`. By the end, you'll be able to:
+In this guide, we'll walk you through importing buildings data from OSM into your Geobase PostgreSQL database using `osm2pgsql`. The buildings will have heights and will be displayed as 3D buildings in Geobase.
+
+![3dbuildings](https://osm2pgsql.org/examples/3dbuildings/3dbuildings-manhatten.png)
+
+By the end, you'll be able to:
 
 1. Download OSM data from Protomaps.
-2. Import the data into Geobase Postgres.
+2. Import the data into Geobase PostgreSQL.
 3. Visualize the imported data using MapLibre through the Geobase Tile Server.
 
-<div class="info">
-  <strong>Note:</strong> Ensure you have PostGIS enabled in your Geobase instance before proceeding.
-</div>
+<Callout type="info" emoji="ℹ️">
+  PostGIS is automatically enabled in your Geobase instance. But if you need to check it, you can do so in your Geobase dashboard by navigating to `Database` > `Extensions`.
+</Callout>
 
 ## Prerequisites
-
-- **osm2pgsql**: A tool for importing OSM data into PostgreSQL/PostGIS databases. Installation instructions are available on the [osm2pgsql website](https://osm2pgsql.org/doc/install.html).
+1. **Geobase project is ready**: Ensure you have created a project on Geobase and have your database connection details from your Geobase project dashboard by navigating to `Project Settings` > `Connection Info`.
+2. **`osm2pgsql` is installed**: `osm2pgsql`, a tool for importing OSM data into PostgreSQL/PostGIS databases. Installation instructions are available on the [osm2pgsql website](https://osm2pgsql.org/doc/install.html).
 
 
 ![osm2pgsql](https://d2w9rnfcy7mm78.cloudfront.net/31915594/original_33a7698a7032cd966bc0bfbd9591a877.png?1730644965?bc=0)
 
-- **Geobase Postgres Database**: Ensure you have access to your Geobase project's database connection details.
 
 ## Step 1: Download OSM Data from Protomaps
 
@@ -49,20 +54,32 @@ Retrieve your Geobase database connection details:
    - **Password**
    - **Port**
 
+![connection-details](https://private-user-images.githubusercontent.com/1907/382624242-57b1e472-1b93-4405-8d85-38c005144dd6.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3MzA2ODY2OTIsIm5iZiI6MTczMDY4NjM5MiwicGF0aCI6Ii8xOTA3LzM4MjYyNDI0Mi01N2IxZTQ3Mi0xYjkzLTQ0MDUtOGQ4NS0zOGMwMDUxNDRkZDYucG5nP1gtQW16LUFsZ29yaXRobT1BV1M0LUhNQUMtU0hBMjU2JlgtQW16LUNyZWRlbnRpYWw9QUtJQVZDT0RZTFNBNTNQUUs0WkElMkYyMDI0MTEwNCUyRnVzLWVhc3QtMSUyRnMzJTJGYXdzNF9yZXF1ZXN0JlgtQW16LURhdGU9MjAyNDExMDRUMDIxMzEyWiZYLUFtei1FeHBpcmVzPTMwMCZYLUFtei1TaWduYXR1cmU9MDQzYzZmMzU2Mjg1ZTIwY2VlMTI0NDdhNDQxZjBlMjhkOTZlY2RjZjcwMzgxMmQ3MjJjMjRhMTk5NWU2YzA4YiZYLUFtei1TaWduZWRIZWFkZXJzPWhvc3QifQ.nu2xsKqLeY_nEN6IESt7uguFBM5p3DaQt7dr-E0-KGw)
+
 These details will be used to connect `osm2pgsql` to your Geobase Postgres database.
 
 ## Step 3: Import OSM Data into Geobase
 
 With your `.osm.pbf` file and database connection details ready, proceed to import the data:
 
-1. **Download the Lua Configuration Script**: For 3D building data, download the `3dbuildings.lua` script from the [osm2pgsql examples](https://osm2pgsql.org/examples/3dbuildings/).
+1. **Download the Lua Configuration Script**: For 3D building data, download the `3dbuildings.lua` script from [3dbuildings.lua](https://osm2pgsql.org/examples/3dbuildings/3dbuildings.lua).
 
-2. **Run osm2pgsql Command**: Open your terminal and execute the following command, replacing placeholders with your actual details:
+You can also use `curl` to download the script:
+```bash
+curl -O https://osm2pgsql.org/examples/3dbuildings/3dbuildings.lua
+```
 
-   ```bash
-   osm2pgsql -d your_database -U your_user -H your_host -P your_port \
-             --password -O flex -S 3dbuildings.lua your_map.osm.pbf
+<Callout type="info" emoji="ℹ️">
+`osm2pgsql` uses the lua script as a recipe to process the osm data and import it into the database that you provide it a connection to. In our example we are using the `3dbuildings.lua` script is for loading building footprints and their heights from osm into Geobase and displaying them as 3D buildings.
+</Callout>
 
+2. **Run `osm2pgsql` Command**: Open your terminal and execute the following command, replacing placeholders with your actual details: 
+
+```bash
+osm2pgsql -d postgres -U supabase_admin -H YOUR_PROJECT_REF.geobase.app -P 6443 \
+          --password -O flex -S 3dbuildings.lua your_map.osm.pbf
+```
+> you will need to replace `YOUR_PROJECT_REF` with your actual project reference and you will be prompted for the database password
 
 * `-d`: Database name.
 * `-U`: Database user.
@@ -101,7 +118,9 @@ After importing the data:
 
 ## Additional Resources
 
+- **maplibre**: [MapLibre](https://maplibre.org/maplibre-gl-js/docs/) is an open-source, interoperable fork of Mapbox GL JS.
 - **osm2pgsql Documentation**: Comprehensive guides and examples are available on the [osm2pgsql website](https://osm2pgsql.org/doc/manual.html).
 - **Protomaps Documentation**: Learn more about data extraction and usage at [Protomaps Docs](https://docs.protomaps.com/).
 
-By following these steps, you can effectively import and visualize OSM data within your Geobase environment. If you encounter any issues or have further questions, consult the respective documentation or reach out to support channels.
+## Support
+If you encounter any issues or have further questions, reach out on [Discord](https://discord.gg/4susZSj4bd).
