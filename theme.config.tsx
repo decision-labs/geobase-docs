@@ -29,9 +29,9 @@ const config = {
 		link: "https://github.com/decision-labs/geobase",
 	},
 	chat: {
-		link: "https://discord.com",
+		link: "https://discord.gg/4susZSj4bd",
 	},
-	docsRepositoryBase: "https://github.com/decision-labs/geobase-docs",
+	docsRepositoryBase: "https://github.com/sabman/geobase-docs",
 	footer: {
 		content: `Geobase.app © ${new Date().getFullYear()}`,
 	},
