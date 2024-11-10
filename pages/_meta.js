@@ -1,9 +1,8 @@
 export default {
-	"index": "Getting Started",
+	"index": "Quick Start",
 	"data-imports": "Data Imports",
 	"blueprints": "Blueprints",
 	"guides": "Guides",
-	"examples": "Examples",
 	"tileserver": "Tile Server",
 	"supabase": "Supabase Docs",
 	"signup": {
