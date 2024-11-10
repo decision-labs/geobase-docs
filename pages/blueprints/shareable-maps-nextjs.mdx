@@ -1,27 +1,177 @@
-import { Callout } from 'nextra/components'
+import Image from 'next/image';
+import { Callout } from 'nextra/components';
 
-# Shareable Maps App (Next.js)
+# Blueprint: Shareable Maps (Next.js)
 
-## Overview
+In this technical guide, we'll walk you through setting up a shareable maps application using Next.js and Geobase, leveraging modern web technologies to create a robust mapping solution.
 
-This blueprint is a simple shareable maps app built with Next.js. It allows users to view and share maps with their friends.
+![Shareable Maps](https://d2w9rnfcy7mm78.cloudfront.net/32095698/original_81613210b05124186b5010af03eee19b.png?1731233345?bc=0)
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcSet="https://d2w9rnfcy7mm78.cloudfront.net/30795995/original_8458f9231ab89f561872e67e4f51e84f.png?1726704188?bc=0"/>
-  <source media="(prefers-color-scheme: light)" srcSet="https://d2w9rnfcy7mm78.cloudfront.net/30795984/original_582396243e6d8b180bd5ca684e12ca33.png?1726704142?bc=0"/>
-  <img alt="Blueprint screenshot" src="https://d2w9rnfcy7mm78.cloudfront.net/30795984/original_582396243e6d8b180bd5ca684e12ca33.png?1726704142?bc=0"/>
-</picture>
+## What's Included
 
-## Getting Started
+To kick things off, ensure you have an account on [Geobase](https://geobase.app). Once you're signed up, create a new project. With your Geobase project ready:
 
-<Callout emoji="🐣">
-  **Create an account** https://geobase.app and create a new project.
+1. **Initialize your project:** [Use this template to create a new repository](https://github.com/decision-labs/geobase-blueprint-shareable-maps-nextjs?tab=readme-ov-file). This action generates a fresh copy of the repository without any commit history.
+2. **Configure environment and settings:** Follow the steps below to set up and run the project.
+
+<Callout type="info" emoji="ℹ️">
+  Ensure your Geobase project is properly configured before proceeding.
 </Callout>
 
-<Callout emoji="🐥">
-  **Fork template** https://github.com/decision-labs/geobase-blueprint-shareable-maps-nextjs and follow the instructions in the README to get started.
+---
+
+## Development
+
+### Migration
+
+Set up your database using either `psql` or the Geobase Studio.
+
+#### Option 1: Using `psql`
+1. Verify your `psql` version is compatible with the Geobase project (Postgres 14 or 15).
+2. Set the `DATABASE_URI` using the URI from your Geobase project settings:
+   ```bash
+   export DATABASE_URI=<your-database-uri>
+   ```
+3. Execute the initial migration file to set up the database:
+   ```bash
+   psql -d $DATABASE_URI -f geobase/migrations/20240813165645_project-setup.sql
+   ```
+
+#### Option 2: Via the Geobase Studio
+
+![Shareable Maps](https://d2w9rnfcy7mm78.cloudfront.net/32095696/original_0ec37c01119b7b13601f3418bd555c2f.png?1731233336?bc=0)
+
+- Navigate to the SQL Editor: Open the Geobase Studio, go to the SQL Editor, and open the setup [migration file](https://github.com/decision-labs/geobase-blueprint-shareable-maps-nextjs/blob/main/geobase/migrations/20240813165645_project-setup.sql).
+- Copy & Run the Migration: Copy the migration SQL script contents and execute it directly in the editor.
+
+
+### Environment Variables
+
+To connect your app to Geobase, configure these environment variables. Include them in a `.env.local` file for local development.
+
+```env
+NEXT_PUBLIC_GEOBASE_URL=https://YOUR_PROJECT_REF.geobase.app
+NEXT_PUBLIC_GEOBASE_ANON_KEY=YOUR_GEOBASE_PROJECT_ANON_KEY
+```
+
+You can locate the project reference and anon key in your Geobase project settings.
+
+![Shareable Maps](https://d2w9rnfcy7mm78.cloudfront.net/31914170/original_ef57a92228a6a65472ebd2dfb766a8d7.png?1730636735?bc=0)
+
+### Local Development
+
+- Set Node.js version: Use Node version 21:
+  ```bash
+  nvm use 21
+  ```
+- Install dependencies: Use your preferred package manager:
+  ```bash
+  npm install
+  # or
+  yarn
+  # or
+  pnpm install
+  ```
+- Start the development server with HTTPS enabled:
+  ```bash
+  npm run dev --experimental-https
+  # or
+  yarn dev --experimental-https
+  # or
+  pnpm dev --experimental-https
+  ```
+
+<Callout type="info" emoji="ℹ️">
+  Note: Without `--experimental-https`, the email verification links might redirect to `https://localhost:3000/...`, causing errors. You can navigate manually by removing `https` from the URL if needed.
 </Callout>
 
-<Callout emoji="🐔">
-  **Help** If you get stuck reach out to us on [Discord](https://discord.gg/4susZSj4bd).
+Access the project at `https://localhost:3000`.
+
+## GitHub Auth Provider
+
+To integrate GitHub as an authentication provider, follow these steps:
+
+1. Enable GitHub in Geobase Studio: In the Authentication tab, go to Providers and enable GitHub.
+2. Create a GitHub OAuth App: In GitHub's developer settings, create a new OAuth app. Set the callback URL to match the URL shown in Geobase Studio's auth provider settings. Save the client ID and secret for later.
+3. Add Credentials in Geobase Studio: Return to Geobase Studio and enter the client ID and secret under the GitHub provider settings.
+
+![Shareable Maps](https://d2w9rnfcy7mm78.cloudfront.net/32095750/original_35333f6441545b2d83403b3afbd3cec3.png?1731233811?bc=0)
+## Deployment
+
+Deploy this application seamlessly with [Vercel](https://vercel.com/), the creators of Next.js. Refer to the [Next.js deployment guide](https://nextjs.org/learn-pages-router/basics/deploying-nextjs-app/deploy) for specific deployment instructions and setup options.
+
+## Database Overview
+
+This blueprint's database is structured to support user profiles, map projects, and associated map elements like pins, drawings, and annotations. Here's a summary:
+
+![Shareable Maps](https://d2w9rnfcy7mm78.cloudfront.net/32095790/original_f5a1cd2578bfb36ef7de4f932fdc4b0a.png?1731234023?bc=0)
+
+### Tables
+
+- `public.profiles`: Stores user profile data.
+- `public.smb_map_projects`: Holds details about map projects.
+- `public.smb_drawings`: Stores line drawings associated with map projects.
+- `public.smb_pins`: Contains pin locations for maps.
+- `public.smb_annotations`: Maintains annotations related to map projects.
+
+🗺️ Note: Items like drawings, pins, and annotations are served as vector map tiles using the Geobase automatic tile server.
+
+### Triggers & Functions
+
+**Functions:**
+
+![Shareable Maps](https://d2w9rnfcy7mm78.cloudfront.net/32095800/original_fec14c054e5d574def755467afe55511.png?1731234100?bc=0)
+
+- `public.handle_new_user()`: Adds a profile row for new users.
+- `public.update_project_bounds()`: Adjusts map project boundaries when changes are made to pins, drawings, annotations, or attachments.
+
+**Triggers:**
+
+![Shareable Maps](https://d2w9rnfcy7mm78.cloudfront.net/32095808/original_71f6a73704140707cfc08853511763d2.png?1731234118?bc=0)
+
+- `on_auth_user_created`: Calls `handle_new_user()` when a new user is created.
+- Boundary Update Triggers: Update map bounds when drawings, pins, annotations, or attachments change.
+
+### Row Level Security (RLS)
+
+RLS policies ensure secure, private access to table data:
+
+- **Profiles**: Users can read/write their own profile. All profiles are readable by the public.
+- **Map Projects**: Public can read published projects, but only project owners have full access.
+- **Map Elements (drawings, pins, annotations)**: Public can view published items; owners have full control.
+- **Storage Policies**: Policies for the avatars bucket are applied to manage avatar access.
+
+![Shareable Maps](https://d2w9rnfcy7mm78.cloudfront.net/32095830/original_e0acbee7d7a2575e98cff4c2aeac9827.png?1731234260?bc=0)
+
+## Blueprint Structure
+
+This project follows a modular structure using `shadcn/ui` for UI components, organized as follows:
+
+- **UI Components**: The core building blocks (e.g., buttons, inputs) are located here.
+- **Views**: Higher-level compositions that combine UI components into specific user flows.
+- **Providers**: Components providing state and utility functions for data management and app functionality.
+
+## Learn More
+
+For additional information, refer to:
+
+- [Next.js documentation](https://nextjs.org/docs)
+- [Geobase documentation](https://geobase.app/docs)
+
+<Callout type="info" emoji="ℹ️">
+  For support, reach out on [Discord](https://discord.gg/4susZSj4bd).
 </Callout>
+
+## Using the Application
+
+![Shareable Maps](https://d2w9rnfcy7mm78.cloudfront.net/32095870/original_73c0347cf1ccd60c27a029cc71039c65.png?1731234463?bc=0)
+
+After successfully setting up and running your local environment, you'll be greeted with a welcoming landing page featuring an interactive map. This is your starting point for exploring the application's capabilities.
+
+
+To begin using the application, click on the login/signup button. This will guide you through the authentication process. Once you've logged in or signed up, you'll be seamlessly redirected to your personalized map board, where you can start creating and managing your map projects.
+
+## Conclusion
+
+By following this blueprint, you've successfully set up a shareable maps application using Next.js and Geobase. This guide has walked you through the essential steps, from initializing your project to deploying it on Vercel. With the robust features provided by Geobase, you can now create, manage, and share interactive maps with ease. Continue exploring the capabilities of your application and consider expanding its functionality by integrating additional features or services. For further assistance or to connect with other developers, don't hesitate to join our community on [Discord](https://discord.gg/4susZSj4bd). Happy mapping!
+
