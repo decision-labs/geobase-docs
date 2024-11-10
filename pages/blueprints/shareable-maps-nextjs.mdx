@@ -5,7 +5,7 @@ import { Callout } from 'nextra/components';
 
 In this technical guide, we'll walk you through setting up a shareable maps application using Next.js and Geobase, leveraging modern web technologies to create a robust mapping solution.
 
-![Shareable Maps](https://d2w9rnfcy7mm78.cloudfront.net/32095698/original_81613210b05124186b5010af03eee19b.png?1731233345?bc=0)
+![Geobase Settings](https://d2w9rnfcy7mm78.cloudfront.net/32095698/original_81613210b05124186b5010af03eee19b.png?1731233345?bc=0)
 
 ## What's Included
 
@@ -36,10 +36,10 @@ Set up your database using either `psql` or the Geobase Studio.
    ```bash
    psql -d $DATABASE_URI -f geobase/migrations/20240813165645_project-setup.sql
    ```
+![Shareable Maps](https://d2w9rnfcy7mm78.cloudfront.net/32095696/original_0ec37c01119b7b13601f3418bd555c2f.png?1731233336?bc=0)
 
 #### Option 2: Via the Geobase Studio
 
-![Shareable Maps](https://d2w9rnfcy7mm78.cloudfront.net/32095696/original_0ec37c01119b7b13601f3418bd555c2f.png?1731233336?bc=0)
 
 - Navigate to the SQL Editor: Open the Geobase Studio, go to the SQL Editor, and open the setup [migration file](https://github.com/decision-labs/geobase-blueprint-shareable-maps-nextjs/blob/main/geobase/migrations/20240813165645_project-setup.sql).
 - Copy & Run the Migration: Copy the migration SQL script contents and execute it directly in the editor.
