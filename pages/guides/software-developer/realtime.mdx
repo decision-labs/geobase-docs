@@ -1,1 +1,262 @@
-# Real-time
+import Image from 'next/image';
+import { Callout } from 'nextra/components';
+
+# Real-time Collaborative Map Application
+
+A real-time interactive map application built with Next.js, MapLibre GL, and Geobase that enables multiple users to collaborate on shared maps in real-time.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcSet="https://d2w9rnfcy7mm78.cloudfront.net/32828720/original_85853dae06984d6ac75f36ce4cbb8aa2.png?1733644162?bc=0"/>
+  <source media="(prefers-color-scheme: light)" srcSet="https://d2w9rnfcy7mm78.cloudfront.net/32828720/original_85853dae06984d6ac75f36ce4cbb8aa2.png?1733644162?bc=0"/>
+  <img alt="Collaborative Map Screenshot" src="https://d2w9rnfcy7mm78.cloudfront.net/32828720/original_85853dae06984d6ac75f36ce4cbb8aa2.png?1733644162?bc=0"/>
+</picture>
+
+## Real-time Features
+
+This application leverages Geobase's real-time capabilities to provide:
+
+1. **Broadcast**: Send ephemeral cursor position updates between clients with low latency
+2. **Presence**: Track and synchronize active users and their states
+3. **Database Changes**: Listen to Postgres changes for collaborative features
+
+<Callout type="info" emoji="ℹ️">
+  Real-time features are powered by Geobase's globally distributed cluster of Realtime servers.
+</Callout>
+
+## MouseTracker Component
+
+The MouseTracker component is the core of our real-time collaborative features. It enables:
+
+- Real-time cursor tracking for all connected users
+- Pin placement on map click
+- User presence tracking with avatars
+- Automatic cleanup of stale cursors
+
+### Technical Implementation
+
+```typescript
+type CursorPosition = {
+  userId: string;
+  x: number;
+  y: number;
+  timestamp: number;
+};
+
+type PresenceState = {
+  user: string;
+  online_at: string;
+  avatar: string;
+};
+```
+
+### Real-time Communication
+
+The component utilizes three Geobase channels for different purposes:
+
+1. **Cursor Broadcasting**:
+```typescript
+const channel = Geobase.channel('room_01')
+  .on('broadcast', { event: 'mouse-move' }, ({ payload }) => {
+    updateCursorPosition(payload)
+  })
+```
+
+2. **User Presence**:
+```typescript
+const presenceChannel = Geobase.channel('presence_01')
+  .on('presence', { event: 'sync' }, () => {
+    const state = presenceChannel.presenceState()
+    updatePresence(state)
+  })
+```
+
+3. **Pin Updates**:
+```typescript
+const pinChannel = Geobase.channel('public:pins')
+  .on('postgres_changes', { event: 'INSERT', schema: 'public' }, 
+    payload => {
+      addNewPin(payload.new)
+    }
+  )
+```
+
+<Callout type="warning" emoji="⚠️">
+  Ensure proper cleanup of channel subscriptions when components unmount to prevent memory leaks.
+</Callout>
+
+### Performance Optimizations
+
+The component implements several optimizations:
+
+1. **Throttled Updates**: Mouse movements are throttled to prevent channel overflow
+```typescript
+const broadcastPosition = _.throttle((position) => {
+  channel.broadcast('mouse-move', position)
+}, 50)
+```
+
+2. **Automatic Cleanup**: Stale cursors are removed after inactivity
+```typescript
+const cleanupInterval = setInterval(() => {
+  const now = Date.now()
+  const staleTimeout = 5000 // 5 seconds
+  Object.entries(cursors).forEach(([userId, cursor]) => {
+    if (now - cursor.timestamp > staleTimeout) {
+      removeCursor(userId)
+    }
+  })
+}, 1000)
+```
+
+<Callout type="info" emoji="💡">
+  The cleanup interval ensures the application remains performant even with many simultaneous users.
+</Callout>
+
+### Map Integration
+
+The component integrates with MapLibre GL through custom markers:
+
+```typescript
+const addCursorToMap = (position: CursorPosition) => {
+  const el = document.createElement('div')
+  el.className = 'cursor-marker'
+  
+  new maplibregl.Marker(el)
+    .setLngLat([position.x, position.y])
+    .addTo(map)
+}
+```
+
+### User Presence System
+
+User presence is managed through a combination of real-time channels and local state:
+
+```typescript
+const initializePresence = async () => {
+  const userId = generateUserId()
+  const userState = {
+    user: userId,
+    online_at: new Date().toISOString(),
+    avatar: getUserAvatar(userId)
+  }
+  
+  await presenceChannel.track(userState)
+}
+```
+
+<Callout type="warning" emoji="⚠️">
+  Ensure proper cleanup of presence tracking when users leave the application.
+</Callout>
+
+## What's Included
+
+This blueprint provides a complete real-time mapping solution with:
+
+1. **Real-Time Cursor Tracking**: See other users' cursor positions on the map in real-time
+2. **User Presence**: Track active users with unique avatars and names
+3. **Pin Dropping**: Users can drop permanent pins on the map
+4. **Spatial Database**: Utilizes PostGIS for efficient geospatial queries
+
+![Real-time Collaborative Map]( https://d2w9rnfcy7mm78.cloudfront.net/32828719/original_ed6cef04fd7977ebd4ae02477987bacc.png?1733644159?bc=0)
+
+<Callout type="info" emoji="ℹ️">
+  Ensure you have a Geobase project with PostGIS enabled before proceeding.
+</Callout>
+
+## Development
+
+### Prerequisites
+
+To get started, you'll need:
+- Node.js (v14 or higher)
+- npm or yarn
+- Geobase account with PostGIS enabled
+
+### Environment Variables
+
+Create a `.env.local` file with these variables:
+
+```env
+NEXT_PUBLIC_Geobase_URL=your-Geobase-url
+NEXT_PUBLIC_Geobase_ANON_KEY=your-Geobase-anon-key
+```
+
+### Database Setup
+
+Run this SQL in your Geobase SQL editor:
+
+```sql
+create table public.pins (
+  id serial,
+  user_id uuid not null,
+  x double precision not null,
+  y double precision not null,
+  created_at timestamp without time zone null default now(),
+  geom geometry(Point, 4326),
+  constraint pins_pkey primary key (id)
+);
+
+-- Add spatial indexing
+CREATE INDEX pins_geom_idx ON public.pins USING GIST (geom);
+```
+
+### Local Development
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+```
+
+<Callout type="info" emoji="ℹ️">
+  Access the application at `http://localhost:3000`
+</Callout>
+
+## Core Components
+
+### User Presence System
+
+The application tracks user presence in real-time:
+
+```typescript
+type PresenceState = {
+  user: string;
+  online_at: string;
+};
+```
+
+### Avatar Generation
+
+Avatars are generated deterministically based on user IDs:
+
+```typescript
+const getUserAvatar = (userId: string): string => {
+  return generateAvatar({
+    style: AVATAR_STYLES[styleIndex],
+    backgroundColor: BACKGROUND_COLORS[colorIndex],
+    seed: userId
+  });
+};
+```
+
+## Database Overview
+
+The database structure supports real-time collaboration with these key tables:
+
+- `public.pins`: Stores map pin locations
+
+![Database Table](https://d2w9rnfcy7mm78.cloudfront.net/32828762/original_3d11374ba90706384565790ab9edc389.png?1733644466?bc=0)
+
+## Learn More
+
+For additional information, refer to:
+- [MapLibre GL Documentation](https://maplibre.org/docs)
+- [Geobase Documentation](https://Geobase.com/docs)
+- [Next.js Documentation](https://nextjs.org/docs)
+
+<Callout type="info" emoji="ℹ️">
+  For support, join our [Discord community](https://discord.gg/your-invite-link).
+</Callout>
+
