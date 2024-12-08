@@ -51,7 +51,8 @@ Geobase Auth can be implemented in several ways:
 
 Create a browser client for client-side authentication:
 
-```typescript:utils/geobase/client.ts
+```typescript
+// utils/geobase/client.ts
 import { createBrowserClient } from '@supabase/ssr'
 
 export function createClient() {
@@ -66,7 +67,8 @@ export function createClient() {
 
 Set up server-side authentication handling:
 
-```typescript:utils/geobase/server.ts
+```typescript
+// utils/geobase/server.ts
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
@@ -128,7 +130,8 @@ export const config = {
 
 Implement session updates in the middleware:
 
-```typescript:utils/geobase/middleware.ts
+```typescript
+// utils/geobase/middleware.ts
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
@@ -236,5 +239,5 @@ NEXT_PUBLIC_GEOBASE_ANON_KEY=YOUR_GEOBASE_ANON_KEY
 - [Server Component Authentication](https://geobase.com/docs/guides/auth/server-side/nextjs)
 
 <Callout type="info" emoji="ℹ️">
-  For support and questions, join the [geobase Discord community](https://discord.gg/4susZSj4bd).
+  For support and questions, join the [Geobase discord community](https://discord.gg/4susZSj4bd).
 </Callout>
