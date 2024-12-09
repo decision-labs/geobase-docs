@@ -107,7 +107,8 @@ export function createClient() {
 
 Create a middleware handler to protect routes and manage sessions:
 
-```typescript:middleware.ts
+```typescript
+// middleware.ts
 import { type NextRequest } from 'next/server'
 import { updateSession } from '@/utils/geobase/middleware'
 
