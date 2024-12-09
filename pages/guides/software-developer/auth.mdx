@@ -1,14 +1,15 @@
 import { Callout } from 'nextra/components';
+import GithubLink from '../../../components/github-link';
 
 # Authentication with Next.js and Geobase
 
-In this guide, we'll walk you through implementing a modern authentication system using Next.js 14 and Geobase, featuring server-side session management, protected routes, and secure middleware handling.
+In this guide, we'll walk you through implementing a modern authentication blueprint using Next.js 14 and Geobase, featuring server-side session management, protected routes, and secure middleware handling.
 
 ![geobase-auth-flow](https://d2w9rnfcy7mm78.cloudfront.net/32829545/original_64f8bbc57eb78e7dbeba4e2d61f8ba2c.png?1733648912?bc=0)
 
 ## What's Included
 
-This authentication system provides:
+This authentication blueprint provides:
 
 - 🔐 Server-side and client-side auth utilities
 - 🚀 Middleware session management
@@ -24,7 +25,9 @@ This authentication system provides:
 
 You can find the complete source code for this authentication system in the following GitHub repository:
 
-[Geobase Blueprint Auth GitHub Repository](https://github.com/decision-labs/geobase-blueprint-auth)
+<Callout type="info" emoji="ℹ️">
+  <GithubLink href="https://github.com/decision-labs/geobase-blueprint-auth" text="Geobase Blueprint Auth GitHub Repository"/>
+</Callout>
 
 
 ## Authentication Patterns
@@ -210,7 +213,7 @@ export async function updateSession(request: NextRequest) {
 Create a `.env.local` file with your Geobase credentials:
 
 ```env
-NEXT_PUBLIC_GEOBASE_URL=https://YOUR_PROJECT_ID.geobase.co
+NEXT_PUBLIC_GEOBASE_URL=https://YOUR_PROJECT_ID.geobase.app
 NEXT_PUBLIC_GEOBASE_ANON_KEY=YOUR_GEOBASE_ANON_KEY
 ```
 
