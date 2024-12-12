@@ -1,7 +1,10 @@
 import { Callout } from 'nextra/components';
 import GithubLink from '../../../components/github-link';
+import GettingStarted from '../../../components/GettingStarted.mdx';
 
 # Authentication with Next.js and Geobase
+
+
 
 In this guide, we'll walk you through implementing a modern authentication blueprint using Next.js 14 and Geobase, featuring server-side session management, protected routes, and secure middleware handling.
 
@@ -210,12 +213,7 @@ export async function updateSession(request: NextRequest) {
 
 ## Environment Setup
 
-Create a `.env.local` file with your Geobase credentials:
-
-```env
-NEXT_PUBLIC_GEOBASE_URL=https://YOUR_PROJECT_ID.geobase.app
-NEXT_PUBLIC_GEOBASE_ANON_KEY=YOUR_GEOBASE_ANON_KEY
-```
+<GettingStarted />
 
 ## Best Practices
 

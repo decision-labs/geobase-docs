@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import { Callout } from 'nextra/components';
+import GettingStarted from '../../components/GettingStarted.mdx';
 
 # Shareable Maps (Next.js)
 
@@ -51,45 +52,7 @@ Set up your database using either `psql` or the Geobase Studio.
 
 ### Environment Variables
 
-To connect your app to Geobase, configure these environment variables. Include them in a `.env.local` file for local development.
-
-```env
-NEXT_PUBLIC_GEOBASE_URL=https://YOUR_PROJECT_REF.geobase.app
-NEXT_PUBLIC_GEOBASE_ANON_KEY=YOUR_GEOBASE_PROJECT_ANON_KEY
-```
-
-You can locate the project reference and anon key in your Geobase project settings.
-
-![Shareable Maps](https://d2w9rnfcy7mm78.cloudfront.net/31914170/original_ef57a92228a6a65472ebd2dfb766a8d7.png?1730636735?bc=0)
-
-### Local Development
-
-- Set Node.js version: Use Node version 21:
-  ```bash
-  nvm use 21
-  ```
-- Install dependencies: Use your preferred package manager:
-  ```bash
-  npm install
-  # or
-  yarn
-  # or
-  pnpm install
-  ```
-- Start the development server with HTTPS enabled:
-  ```bash
-  npm run dev --experimental-https
-  # or
-  yarn dev --experimental-https
-  # or
-  pnpm dev --experimental-https
-  ```
-
-<Callout type="info" emoji="ℹ️">
-  Note: Without `--experimental-https`, the email verification links might redirect to `https://localhost:3000/...`, causing errors. You can navigate manually by removing `https` from the URL if needed.
-</Callout>
-
-Access the project at `https://localhost:3000`.
+<GettingStarted />
 
 ## GitHub Auth Provider
 
