@@ -29,7 +29,7 @@ const config = {
 		link: "https://github.com/decision-labs/geobase",
 	},
 	chat: {
-		link: "https://discord.gg/4susZSj4bd",
+		link: "https://geobase.app/discord",
 	},
 	docsRepositoryBase: "https://github.com/sabman/geobase-docs",
 	defaultShowCopyCode: true,

@@ -1,6 +1,6 @@
 export default {
 	"index": "Quick Start",
-	"data-imports": "Data Imports",
+	"importing-data": "Importing Data",
 	"blueprints": "Blueprints",
 	"guides": "Guides",
 	"tileserver": "Tile Server",
