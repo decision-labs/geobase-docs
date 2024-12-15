@@ -76,6 +76,18 @@ ogr2ogr -f "PostgreSQL" \
   -lco GEOMETRY_NAME=geom
 ```
 
+**Import from PostGIS to PostGIS:**
+```bash
+ogr2ogr -f "PostgreSQL" \
+  PG:"host=YOUR_PROJECT_REF.geobase.app port=6443 dbname=postgres user=supabase_admin password=YOUR_DB_PASSWORD" \
+  PG:"host=source-host port=5432 dbname=source_db user=source_user password=source_password" \
+  -sql "SELECT * FROM source_schema.source_table" \
+  -nln target_schema.target_table \
+  -nlt MULTIPOLYGON \
+  -lco GEOMETRY_NAME=geom \
+  -skipfailures
+```
+
 ### Common Options
 
 - `-t_srs EPSG:4326`: Reproject to WGS84
