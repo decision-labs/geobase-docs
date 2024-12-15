@@ -1,3 +1,5 @@
+import { Callout } from 'nextra/components'
+
 # GIS Formats
 
 1. Shapefile
@@ -8,3 +10,77 @@
 6. ESRI Geodatabase
 7. PostGIS
 8. OpenStreetMap
+
+## Importing with ogr2ogr
+
+<Callout type="info" emoji="ℹ️">
+  **Prerequisite**: You must have `ogr2ogr` installed on your system. It's part of the GDAL package:
+  - macOS: `brew install gdal`
+  - Ubuntu/Debian: `sudo apt-get install gdal-bin`
+  - Windows: Download from [GDAL binaries](https://gdal.org/en/latest/download.html#binaries)
+</Callout>
+
+ogr2ogr is a powerful command-line tool for converting various geospatial formats into PostGIS. Here's the general command structure for importing data into Geobase:
+
+> **Note**: You can find your connection details in the Geobase dashboard under `Project Settings > Connection Info`.
+
+> **Important**: Always specify a concrete geometry type (e.g., POINT, MULTIPOLYGON) instead of using the abstract GEOMETRY type. This is required for proper spatial indexing and visualization.
+
+```bash
+ogr2ogr -f "PostgreSQL" \
+  PG:"host=YOUR_PROJECT_REF.geobase.app port=6443 dbname=postgres user=supabase_admin password=YOUR_DB_PASSWORD" \
+  input_file.extension \
+  -nln schema_name.table_name \
+  -nlt MULTIPOLYGON \
+  -lco GEOMETRY_NAME=geom \
+  -lco FID=id \
+  -lco PRECISION=NO
+```
+
+### Parameters Explained
+
+- `-f "PostgreSQL"`: Output format (PostGIS)
+- `PG:"..."`: Connection string using your Geobase project details from Settings
+  - `YOUR_PROJECT_REF`: Your project reference from Connection Info
+  - `YOUR_DB_PASSWORD`: Database password from Connection Info
+- `input_file.extension`: Your input file (e.g., data.shp, data.geojson)
+- `-nln schema_name.table_name`: Output table name (e.g., public.my_data)
+- `-nlt GEOMETRY_TYPE`: Specify concrete geometry type:
+  - `POINT` for point data
+  - `MULTIPOINT` for multiple points
+  - `LINESTRING` or `MULTILINESTRING` for lines
+  - `POLYGON` or `MULTIPOLYGON` for polygons
+- `-lco GEOMETRY_NAME=geom`: Name of the geometry column
+- `-lco FID=id`: Name of the primary key column
+- `-lco PRECISION=NO`: Disable precision for floating-point numbers
+
+### Examples
+
+**Import Building Polygons:**
+```bash
+ogr2ogr -f "PostgreSQL" \
+  PG:"host=YOUR_PROJECT_REF.geobase.app port=6443 dbname=postgres user=supabase_admin password=YOUR_DB_PASSWORD" \
+  buildings.geojson \
+  -nln public.buildings \
+  -nlt MULTIPOLYGON \
+  -lco GEOMETRY_NAME=geom
+```
+
+**Import Point Locations:**
+```bash
+ogr2ogr -f "PostgreSQL" \
+  PG:"host=YOUR_PROJECT_REF.geobase.app port=6443 dbname=postgres user=supabase_admin password=YOUR_DB_PASSWORD" \
+  locations.shp \
+  -nln public.locations \
+  -nlt POINT \
+  -lco GEOMETRY_NAME=geom
+```
+
+### Common Options
+
+- `-t_srs EPSG:4326`: Reproject to WGS84
+- `-s_srs EPSG:XXXX`: Specify source projection
+- `-where "COLUMN='VALUE'"`: Filter input features
+- `-select "column1,column2"`: Select specific columns
+- `-skipfailures`: Skip failed features
+- `-overwrite`: Replace existing table
