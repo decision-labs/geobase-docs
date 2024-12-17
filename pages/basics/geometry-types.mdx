@@ -1,0 +1,96 @@
+# Geometry Types
+
+Geobase's tile server supports all standard PostGIS geometry types. Here's a detailed breakdown of each type and how to work with them:
+
+## Point Geometries
+
+- **POINT**: Single coordinate pair representing a specific location
+- **MULTIPOINT**: Collection of points
+
+```sql
+-- Point example
+SELECT ST_MakePoint(-122.4194, 37.7749) as geom;
+
+-- MultiPoint example
+SELECT ST_GeomFromText('MULTIPOINT(-122.4194 37.7749, -122.4184 37.7739)') as geom;
+```
+
+## Line Geometries
+
+- **LINESTRING**: Series of connected points forming a line
+- **MULTILINESTRING**: Collection of linestrings
+
+```sql
+-- LineString example
+SELECT ST_GeomFromText('LINESTRING(-122.4194 37.7749, -122.4184 37.7739)') as geom;
+
+-- MultiLineString example
+SELECT ST_GeomFromText('MULTILINESTRING(
+    (-122.4194 37.7749, -122.4184 37.7739),
+    (-122.4184 37.7739, -122.4174 37.7729)
+)') as geom;
+```
+
+## Polygon Geometries
+
+- **POLYGON**: Closed shape defined by a ring of coordinates
+- **MULTIPOLYGON**: Collection of polygons
+
+```sql
+-- Polygon example (must close the ring)
+SELECT ST_GeomFromText('POLYGON((
+    -122.4194 37.7749,
+    -122.4184 37.7739,
+    -122.4174 37.7729,
+    -122.4194 37.7749
+))') as geom;
+
+-- MultiPolygon example
+SELECT ST_GeomFromText('MULTIPOLYGON((
+    (-122.4194 37.7749, -122.4184 37.7739, -122.4174 37.7729, -122.4194 37.7749)
+),(
+    (-122.4294 37.7849, -122.4284 37.7839, -122.4274 37.7829, -122.4294 37.7849)
+))') as geom;
+```
+
+## Geometry Collections
+
+- **GEOMETRYCOLLECTION**: Mixed collection of different geometry types
+
+```sql
+SELECT ST_GeomFromText('GEOMETRYCOLLECTION(
+    POINT(-122.4194 37.7749),
+    LINESTRING(-122.4194 37.7749, -122.4184 37.7739),
+    POLYGON((-122.4194 37.7749, -122.4184 37.7739, -122.4174 37.7729, -122.4194 37.7749))
+)') as geom;
+```
+
+## MapLibre Layer Types
+
+When displaying these geometries in MapLibre GL JS, use the appropriate layer type:
+
+```javascript
+// For Point/MultiPoint geometries
+map.addLayer({
+    id: 'points-layer',
+    type: 'circle',  // or 'symbol' for icons
+    source: 'data-source',
+    'source-layer': 'layer-name',
+});
+
+// For LineString/MultiLineString geometries
+map.addLayer({
+    id: 'lines-layer',
+    type: 'line',
+    source: 'data-source',
+    'source-layer': 'layer-name',
+});
+
+// For Polygon/MultiPolygon geometries
+map.addLayer({
+    id: 'polygons-layer',
+    type: 'fill',  // or 'fill-extrusion' for 3D
+    source: 'data-source',
+    'source-layer': 'layer-name',
+});
+```
