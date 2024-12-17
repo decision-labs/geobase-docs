@@ -1,19 +1,377 @@
 # Tile Server
 
-Tile servers on Geobase are automatically generated whenever a table is created with a `geometry` column or when a postgres function is created with the following signature:
+Geobase automatically generates vector tile endpoints for your spatial data, making it easy to visualize your geographic data on interactive web maps.
+
+## What are Vector Tiles?
+
+Vector tiles are packets of geographic data, delivered to a map in small chunks. Unlike raster tiles (regular map images), vector tiles contain the raw geometric data, enabling:
+
+- Dynamic styling
+- Smooth zoom levels
+- Smaller file sizes
+- Interactive features
+
+## Automatic Tile Server Generation
+
+Geobase creates tile endpoints automatically in two scenarios:
+
+### 1. Tables with Geometry Columns
+
+Any table containing a `geometry` column will automatically get a tile endpoint.
+
+### 2. Custom Tile Generation Functions
+
+You can create dynamic tile endpoints by defining PostgreSQL functions. These functions must have the following signature:
 
 ```sql
 CREATE OR REPLACE FUNCTION public.get_tiles(
-	z integer,
-	x integer,
-	y integer
+    z integer,  -- zoom level
+    x integer,  -- tile x coordinate
+    y integer   -- tile y coordinate
+)
+RETURNS bytea   -- returns tile in MVT format
+LANGUAGE plpgsql
+```
+
+#### Function Parameters
+
+Any additional function parameters beyond the required `z`, `x`, and `y` will be exposed as URL query parameters in the tile endpoint. For example:
+
+```sql
+CREATE OR REPLACE FUNCTION public.get_routing_tiles(
+    z integer,
+    x integer,
+    y integer,
+    start_point geometry = NULL,
+    end_point geometry = NULL
+)
+RETURNS bytea
+```
+
+This function would be accessible at:
+
+```
+https://[project_id].geobase.app/tileserver/v1/rpc.get_routing_tiles/{z}/{x}/{y}.pbf?start_point=POINT(...)&end_point=POINT(...)
+```
+
+#### Dynamic Return Types
+
+Function-based tile endpoints can return different types of geometries. When implementing the client-side map, make sure to:
+
+1. Set the appropriate layer type (`point`, `line`, `fill`)
+2. Use the correct `source-layer` (defaults to 'default')
+3. Adjust the map bounds and center to match your data
+
+Example MapLibre implementation:
+
+```javascript
+const map = new maplibregl.Map({
+	container: "map",
+	style: BASE_MAPS.light,
+	bounds: [-180, -90, 180, 90], // Adjust based on your data extent
+});
+
+map.on("load", () => {
+	map.addSource("routing_tiles", {
+		type: "vector",
+		tiles: [
+			`https://[project_id].geobase.app/tileserver/v1/rpc.get_routing_tiles/{z}/{x}/{y}.pbf?apikey=${apiKey}&start_point=POINT(0 0)`,
+		],
+	});
+
+	map.addLayer({
+		id: "routing-layer",
+		type: "line", // Adjust based on your geometry type
+		source: "routing_tiles",
+		"source-layer": "default",
+		paint: {
+			"line-color": "#FF0000",
+			"line-width": 2,
+		},
+	});
+});
+```
+
+Example routing function:
+
+```sql
+CREATE OR REPLACE FUNCTION public.get_routing_tiles(
+    z integer,
+    x integer,
+    y integer,
+    start_point geometry = NULL,
+    end_point geometry = NULL
 )
 RETURNS bytea
 LANGUAGE plpgsql
 AS $function$
 DECLARE
+    result bytea;
 BEGIN
-	RETURN NULL;
+    WITH bounds AS (
+        SELECT ST_TileEnvelope(z, x, y) AS geom
+    )
+    SELECT ST_AsMVT(tile, 'default')
+    FROM (
+        SELECT
+            ST_AsMVTGeom(
+                route.geometry,
+                bounds.geom,
+                4096,
+                256,
+                true
+            ) AS geom
+        FROM
+            pgr_dijkstra(
+                'SELECT id, source, target, cost FROM roads',
+                nearest_vertex(start_point),
+                nearest_vertex(end_point)
+            ) AS route
+            CROSS JOIN bounds
+        WHERE ST_Intersects(route.geometry, bounds.geom)
+    ) tile
+    INTO result;
+
+    RETURN result;
 END;
-$function$
+$function$;
 ```
+
+## Using Tile Endpoints
+
+### Basic URL Structure
+
+For uncached tiles:
+
+```
+https://[project_id].geobase.app/tileserver/v1/public.[table_name]/{z}/{x}/{y}.pbf?apikey=[ANON_KEY]
+```
+
+For cached tiles:
+
+```
+https://[project_id].geobase.app/tileserver/v1/cached/public.[table_name]/{z}/{x}/{y}.pbf?apikey=[ANON_KEY]
+```
+
+### Query Parameters
+
+#### Properties
+
+Comma-separated list of columns to include in the tiles (helps reduce tile size):
+
+```
+?properties=name,population,area
+```
+
+#### Filters
+
+Geobase supports [Common Query Language (CQL)](https://portal.ogc.org/files/96288) filters to narrow down the features returned in tiles. Filters are passed via the `filter` parameter:
+
+```
+?filter=population > 1000000
+```
+
+Common filter examples:
+
+```sql
+-- Basic comparisons
+population >= 1000000
+name = 'Finland'
+
+-- Between ranges
+population BETWEEN 1000000 AND 9000000
+
+-- Lists
+country IN ('Chile', 'Kenya', 'Denmark')
+
+-- Text matching (% is wildcard)
+name LIKE 'San%'
+name ILIKE '%america'  -- case-insensitive
+
+-- Null checks
+description IS NOT NULL
+
+-- Boolean combinations
+(continent = 'Europe' OR continent = 'Africa') AND population < 1000000
+
+-- Spatial filters
+INTERSECTS(geometry, ENVELOPE(-100, 49, -90, 50))
+DWITHIN(geometry, POINT(-100 49), 0.1)
+
+-- Temporal filters
+created_at > 2001-01-01T00:00
+updated_at BETWEEN '2001-01-01' AND '2001-12-31'
+```
+
+##### URL Encoding Filters
+
+When using filters in your application, use JavaScript's built-in `encodeURIComponent()` to properly encode the filter parameter:
+
+```javascript
+const filter = "population > 1000000 AND name LIKE 'San%'";
+const encodedFilter = encodeURIComponent(filter);
+
+const tileUrl = `https://[project_id].geobase.app/tileserver/v1/public.cities/{z}/{x}/{y}.pbf?apikey=${ANON_KEY}&filter=${encodedFilter}`;
+
+// Use in MapLibre
+map.addSource("cities", {
+	type: "vector",
+	tiles: [tileUrl],
+});
+```
+
+Or when using multiple parameters:
+
+```javascript
+const baseUrl = "https://[project_id].geobase.app/tileserver/v1/public.cities/{z}/{x}/{y}.pbf";
+const params = new URLSearchParams({
+	apikey: ANON_KEY,
+	filter: "population > 1000000 AND name LIKE 'San%'",
+	properties: "name,population,geometry",
+});
+
+const tileUrl = `${baseUrl}?${params.toString()}`;
+```
+
+#### Caching
+
+Toggle caching by including `/cached/` in the URL path:
+
+```
+https://[project_id].geobase.app/tileserver/v1/cached/public.[table_name]/{z}/{x}/{y}.pbf
+```
+
+This is recommended for static datasets that don't change frequently.
+
+## Authentication and Row Level Security (RLS)
+
+When using tables with Row Level Security (RLS) enabled or accessing private datasets, you'll need to include authentication headers in your tile requests. This requires special configuration in your map library.
+
+### MapLibre GL JS
+
+```javascript
+const transformRequest = (url, resourceType) => {
+  // Only transform tile requests to your Geobase project
+  if (
+    resourceType === "Tile" &&
+    url.startsWith(geobase.baseUrl) &&
+    user.auth.token
+  ) {
+    return {
+      url,
+      headers: {
+        // Include the auth token in the request
+        Authorization: `Bearer ${user.auth.token}`,
+      },
+    };
+  }
+};
+
+// Add the transformRequest function to your map configuration
+const map = new maplibregl.Map({
+  container: "map",
+  style: "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json",
+  center: [11.96464, 57.70561],
+  zoom: 10,
+  transformRequest: transformRequest, // Add this line
+});
+```
+
+### Using with Geobase Client
+
+If you're using the Geobase client library:
+
+```javascript
+import { createClient } from '@geobase/client'
+
+const geobase = createClient(
+  'https://[project_id].geobase.app',
+  '[ANON_KEY]'
+)
+
+// Sign in user
+await geobase.auth.signIn({
+  email: 'user@example.com',
+  password: 'password'
+})
+
+// The transformRequest function will now include the current session token
+const transformRequest = (url, resourceType) => {
+  if (
+    resourceType === "Tile" &&
+    url.startsWith(geobase.baseUrl) &&
+    geobase.auth.session()
+  ) {
+    return {
+      url,
+      headers: {
+        Authorization: `Bearer ${geobase.auth.session().access_token}`,
+      },
+    };
+  }
+};
+```
+
+### Other Map Libraries
+
+For other mapping libraries, you'll need to find their equivalent method for transforming requests. The key is to:
+1. Intercept tile requests
+2. Add the Authorization header with your access token
+3. Only transform requests to your Geobase project URLs
+
+## Integration Examples
+
+### MapLibre GL JS
+
+```javascript
+const map = new maplibregl.Map({
+	container: "map",
+	style: "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json",
+	center: [11.96464, 57.70561],
+	zoom: 10,
+});
+
+map.on("load", () => {
+	map.addSource("buildings", {
+		type: "vector",
+		tiles: [`https://[project_id].geobase.app/tileserver/v1/public.buildings/{z}/{x}/{y}.pbf?apikey=${ANON_KEY}`],
+	});
+
+	map.addLayer({
+		id: "buildings-layer",
+		type: "fill",
+		source: "buildings",
+		"source-layer": "public.buildings",
+		paint: {
+			"fill-color": "rgba(123, 168, 234, 0.5)",
+			"fill-outline-color": "rgba(255, 255, 255, 1)",
+		},
+		filter: ["==", "$type", "Polygon"],
+	});
+});
+```
+
+### Mapbox GL JS
+
+[Example implementation with Mapbox GL JS]
+
+### OpenLayers
+
+[Example implementation with OpenLayers]
+
+## Performance Tips
+
+- Use the `properties` parameter to limit returned attributes
+- Enable caching for static datasets
+- Consider using different zoom level strategies for different data densities
+
+## Studio Interface
+
+[Screenshot of the Geobase Studio tile server interface]
+
+The Studio provides a visual interface to:
+
+- View tile endpoint URLs
+- Test tile generation
+- Configure tile properties
+- Monitor usage statistics
