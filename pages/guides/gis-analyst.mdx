@@ -11,13 +11,13 @@ This documentation will guide you through setting up **QGIS** with **Geobase**. 
 - Visualize Geospatial Data
 
 <Steps>
-  
+
 ### Setting Up QGIS
 
 Follow the official installation guide: [https://qgis.org/en/site/forusers/download.html](https://qgis.org/en/site/forusers/download.html)
 
 <Callout type="info" emoji="💚">
-QGIS is open source so don't forget to support the project by [donating](https://qgis.org/funding/donate/) to the QGIS project. 
+QGIS is open source so don't forget to support the project by [donating](https://qgis.org/funding/donate/) to the QGIS project.
 </Callout>
 
 ### Connecting QGIS to Geobase
@@ -25,10 +25,10 @@ Connecting QGIS to Geobase is very similar to connecting to PostgreSQL, you need
 
 To connect with Geobase use the `PostgreSQL` tab in the Browser panel, right-click on the PostgreSQL option to create a `New Connection`.
 
-![geobase_connection](./images/qgis_postgre_connection_dark.png) 
+![geobase_connection](./gis-analyst/images/qgis_postgre_connection_dark.png)
 {/* <picture>
-  <source media="(prefers-color-scheme: dark)" srcSet="./images/qgis_connection.png"/>
-  <source media="(prefers-color-scheme: light)" srcSet="./images/qgis_connection.png"/>
+  <source media="(prefers-color-scheme: dark)" srcSet="./gis-analyst/images/qgis_connection.png"/>
+  <source media="(prefers-color-scheme: light)" srcSet="./gis-analyst/images/qgis_connection.png"/>
   <img alt="Geobase Connection" srcSet="pages/guides/gis-analyst/images/geobase_connection.png"/>
 </picture> */}
 
@@ -42,7 +42,7 @@ The connection details include:
 
 To obtain these connection details, navigate to `Geobase` and click on `Project Settings` in the left navigation panel. You will find the required information under the `Connection Info`.
 
-![geobase_connection](./images/geobase_connection_dark.png)
+![geobase_connection](./gis-analyst/images/geobase_connection_dark.png)
 
 ### Loading and Visualize Data from Geobase into QGIS
 
@@ -53,7 +53,7 @@ To visualize the data, right-click on the table you want to visualize in `public
 Make sure to select tables from the `public` schema when adding layers to the project. The other schemas are not for manipulation and are used for internal purposes.
 </Callout>
 
-![qgis_visualize_data](./images/qgis_visualize_data_dark.png)
+![qgis_visualize_data](./gis-analyst/images/qgis_visualize_data_dark.png)
 
 </Steps>
 Now you are ready to start working with QGIS and Geobase as a GIS analyst.

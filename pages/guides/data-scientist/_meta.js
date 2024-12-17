@@ -1,6 +1,9 @@
 export default {
-  "getting-started": "Getting Started",
-  "geopandas": "Geopandas",
-  "geoparquet": "Geoparquet",
-  "geocoding": "Geocoding"
-}
+	"getting-started": {
+		title: "Getting Started",
+		href: "/guides/data-scientist",
+	},
+	geopandas: "Geopandas",
+	geoparquet: "Geoparquet",
+	geocoding: "Geocoding",
+};

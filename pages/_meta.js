@@ -5,11 +5,10 @@ export default {
 	guides: "Guides",
 	tileserver: "Tile Server",
 	supabase: "Supabase Docs",
-	basics: "Basics",
 	signup: {
 		title: "Sign Up ↗",
 		type: "page",
-		href: "https://geobase.app/",
+		href: "https://studio.geobase.app/sign-up",
 		newWindow: true,
 	},
 	blog: {
