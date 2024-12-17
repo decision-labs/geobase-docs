@@ -1,5 +1,6 @@
 export default {
 	"getting-started": "Getting Started",
-	"auth": "Authentication",
+	"auth-nextjs": "Authentication (Next.js)",
+	"auth-vue": "Authentication (Vue)",
 	"realtime": "Real-time",
 }

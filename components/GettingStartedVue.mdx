@@ -1,0 +1,44 @@
+import { Callout } from 'nextra/components';
+
+
+
+To connect your app to Geobase, configure these environment variables. Include them in a `.env.local` file for local development.
+
+```env
+VITE_GEOBASE_URL=<Your Geobase URL>
+VITE_GEOBASE_ANON_KEY=<Your Geobase Anon Key>
+```
+
+You can locate the project reference and anon key in your Geobase project settings.
+
+![Shareable Maps](https://d2w9rnfcy7mm78.cloudfront.net/31914170/original_ef57a92228a6a65472ebd2dfb766a8d7.png?1730636735?bc=0)
+
+### Local Development
+
+- Set Node.js version: Use Node version 21:
+  ```bash
+  nvm use 21
+  ```
+- Install dependencies: Use your preferred package manager:
+  ```bash
+  npm install
+  # or
+  yarn
+  # or
+  pnpm install
+  ```
+- Start the development server with HTTPS enabled:
+  ```bash
+  npm run dev --experimental-https
+  # or
+  yarn dev --experimental-https
+  # or
+  pnpm dev --experimental-https
+  ```
+
+<Callout type="info" emoji="ℹ️">
+  Note: Without `--experimental-https`, the email verification links might redirect to `https://localhost:5173/...`, causing errors. You can navigate manually by removing `https` from the URL if needed.
+</Callout>
+
+Access the project at `http://localhost:5173`.
+

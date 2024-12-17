@@ -1,0 +1,245 @@
+import { Callout } from 'nextra/components';
+import GithubLink from '../../../components/github-link';
+import GettingStarted from '../../../components/GettingStarted.mdx';
+
+# Authentication with Next.js and Geobase
+
+
+
+In this guide, we'll walk you through implementing a modern authentication blueprint using Next.js 14 and Geobase, featuring server-side session management, protected routes, and secure middleware handling.
+
+![geobase-auth-flow](https://d2w9rnfcy7mm78.cloudfront.net/32829545/original_64f8bbc57eb78e7dbeba4e2d61f8ba2c.png?1733648912?bc=0)
+
+## What's Included
+
+This authentication blueprint provides:
+
+- 🔐 Server-side and client-side auth utilities
+- 🚀 Middleware session management
+- 🛡️ Protected route handling
+- 🍪 Secure cookie management
+- 📱 SSR-compatible authentication
+
+<Callout type="info" emoji="ℹ️">
+  This implementation uses geobase's SSR-compatible authentication helpers for optimal security and performance.
+</Callout>
+
+## GitHub Repository
+
+You can find the complete source code for this authentication system in the following GitHub repository:
+
+<Callout type="info" emoji="ℹ️">
+  <GithubLink href="https://github.com/decision-labs/geobase-blueprint-auth" text="Geobase Blueprint Auth GitHub Repository"/>
+</Callout>
+
+
+## Authentication Patterns
+
+Geobase Auth can be implemented in several ways:
+
+1. **Server-Side Authentication** (Recommended)
+   - Tokens stored in cookies
+   - Protected API routes
+   - Server-side session verification
+
+2. **Client-Side Authentication**
+   - Browser-based token storage
+   - Real-time subscription support
+   - Instant UI updates
+
+<Callout type="info" emoji="ℹ️">
+  Server-side auth is recommended for better security and SEO optimization.
+</Callout>
+
+## Implementation
+
+### Client Setup
+
+Create a browser client for client-side authentication:
+
+```typescript
+// utils/geobase/client.ts
+import { createBrowserClient } from '@supabase/ssr'
+
+export function createClient() {
+  return createBrowserClient(
+    process.env.NEXT_PUBLIC_GEOBASE_URL!,
+    process.env.NEXT_PUBLIC_GEOBASE_ANON_KEY!
+  )
+}
+```
+
+### Server Setup
+
+Set up server-side authentication handling:
+
+```typescript
+// utils/geobase/server.ts
+import { createServerClient } from '@supabase/ssr'
+import { cookies } from 'next/headers'
+
+export function createClient() {
+  const cookieStore = cookies()
+  
+  return createServerClient(
+    process.env.NEXT_PUBLIC_GEOBASE_URL!,
+    process.env.NEXT_PUBLIC_GEOBASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name) {
+          return cookieStore.get(name)?.value
+        },
+        set(name, value, options) {
+          try {
+            cookieStore.set(name, value, options)
+          } catch {
+            // Cookie setting in Server Components can be ignored if middleware handles session refresh
+          }
+        },
+        remove(name, options) {
+          try {
+            cookieStore.set(name, '', { ...options, maxAge: 0 })
+          } catch {
+            // Cookie removal in Server Components can be ignored if middleware handles session refresh
+          }
+        }
+      }
+    }
+  )
+}
+```
+
+### Middleware Configuration
+
+Create a middleware handler to protect routes and manage sessions:
+
+```typescript
+// middleware.ts
+import { type NextRequest } from 'next/server'
+import { updateSession } from '@/utils/geobase/middleware'
+
+export async function middleware(request: NextRequest) {
+  return await updateSession(request)
+}
+
+export const config = {
+  matcher: [
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+  ],
+}
+```
+
+<Callout type="warning" emoji="⚠️">
+  The middleware matcher pattern excludes static files and images while protecting all other routes. Adjust the pattern based on your needs.
+</Callout>
+
+### Session Management
+
+Implement session updates in the middleware:
+
+```typescript
+// utils/geobase/middleware.ts
+import { createServerClient } from '@supabase/ssr'
+import { NextResponse, type NextRequest } from 'next/server'
+
+export async function updateSession(request: NextRequest) {
+  let response = NextResponse.next({
+    request: {
+      headers: request.headers,
+    },
+  })
+
+  const geobase = createServerClient(
+    process.env.NEXT_PUBLIC_GEOBASE_URL!,
+    process.env.NEXT_PUBLIC_GEOBASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name) {
+          return request.cookies.get(name)?.value
+        },
+        set(name, value, options) {
+          request.cookies.set({
+            name,
+            value,
+            ...options,
+          })
+          response = NextResponse.next({
+            request: {
+              headers: request.headers,
+            },
+          })
+          response.cookies.set({
+            name,
+            value,
+            ...options,
+          })
+        },
+        remove(name, options) {
+          request.cookies.set({
+            name,
+            value: '',
+            ...options,
+          })
+          response = NextResponse.next({
+            request: {
+              headers: request.headers,
+            },
+          })
+          response.cookies.set({
+            name,
+            value: '',
+            ...options,
+          })
+        },
+      },
+    }
+  )
+
+  const { data: { user } } = await geobase.auth.getUser()
+
+  if (!user && !request.nextUrl.pathname.startsWith('/login')) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/login'
+    return NextResponse.redirect(url)
+  }
+
+  return response
+}
+```
+
+<Callout type="info" emoji="ℹ️">
+  Avoid adding logic between `createServerClient` and `geobase.auth.getUser()` to prevent unexpected session termination.
+</Callout>
+
+## Environment Setup
+
+<GettingStarted />
+
+## Best Practices
+
+1. **Cookie Management**
+   - Always return the middleware response object as is
+   - Maintain cookie synchronization between browser and server
+   - Handle cookie operations carefully in Server Components
+
+2. **Session Handling**
+   - Implement proper error handling for auth operations
+   - Use try-catch blocks for cookie operations
+   - Consider middleware refresh patterns for Server Components
+
+3. **Security**
+   - Protect sensitive routes using middleware
+   - Implement proper redirect handling
+   - Maintain secure cookie handling practices
+
+![geobase-auth-flow](https://d2w9rnfcy7mm78.cloudfront.net/32829541/original_ff25ad82b50d39346d55a3e4fca069e7.png?1733648906?bc=0)
+
+## Learn More
+
+- [Geobase Auth Documentation](https://geobase.com/docs/guides/auth)
+- [Next.js Middleware Documentation](https://nextjs.org/docs/app/building-your-application/routing/middleware)
+- [Server Component Authentication](https://geobase.com/docs/guides/auth/server-side/nextjs)
+
+<Callout type="info" emoji="ℹ️">
+  For support and questions, join the [Geobase discord community](https://discord.gg/4susZSj4bd).
+</Callout>

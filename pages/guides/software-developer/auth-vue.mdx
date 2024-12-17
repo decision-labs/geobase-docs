@@ -1,0 +1,188 @@
+import { Callout } from 'nextra/components';
+import GithubLink from '../../../components/github-link';
+import GettingStarted from '../../../components/GettingStartedVue.mdx';
+
+# Authentication using Geobase in a Vue project.
+
+This document explains the authentication logic in the Vue project using Geobase for handling user sign-up and sign-in processes.
+
+<Callout type="info" emoji="ℹ️">
+  This guide demonstrates how to implement authentication in a Vue project using Geobase, focusing on client-side authentication and session management.
+</Callout>
+
+## Authentication Form
+
+The `Home.vue` component includes a basic login/sign-up form.
+
+![geobase-auth-flow](https://d2w9rnfcy7mm78.cloudfront.net/33039747/original_3ba4488d20dcc3cdd4c70e5c7a29e609.png?1734418604?bc=0)
+
+
+## GitHub Repository
+
+You can find the complete source code for this authentication system in the following GitHub repository:
+
+<Callout type="info" emoji="ℹ️">
+  <GithubLink href="https://github.com/decision-labs/geobase-realtime-vue" text="Geobase Realtime Vue GitHub Repository"/>
+</Callout>
+
+### Code Overview
+
+```vue
+<template>
+  <div>
+    <h2>Login or Sign Up</h2>
+    <form @submit.prevent="handleAuth">
+      <input v-model="email" type="email" placeholder="Email" required />
+      <input v-model="password" type="password" placeholder="Password" required />
+      <button type="submit">{{ isSignUp ? "Sign Up" : "Sign In" }}</button>
+    </form>
+
+    <p @click="toggleAuthMode" style="cursor: pointer;">
+      {{ isSignUp ? "Already have an account? Sign In" : "Don't have an account? Sign Up" }}
+    </p>
+    <p v-if="error" style="color: red;">{{ error }}</p>
+  </div>
+</template>
+
+<script lang="ts">
+import { defineComponent, ref } from "vue";
+import { Geobase } from "../../lib/geobase";
+import { useRouter } from "vue-router";
+
+export default defineComponent({
+  name: "Home",
+  setup() {
+    const email = ref("");
+    const password = ref("");
+    const error = ref("");
+    const isSignUp = ref(true);
+    const router = useRouter();
+
+    const handleAuth = async () => {
+      error.value = "";
+      try {
+        if (isSignUp.value) {
+          const { error: signUpError } = await Geobase.auth.signUp({
+            email: email.value,
+            password: password.value,
+          });
+          if (signUpError) throw signUpError;
+          alert("Check your email for a confirmation link!");
+        } else {
+          const { error: signInError, data } = await Geobase.auth.signInWithPassword({
+            email: email.value,
+            password: password.value,
+          });
+          if (signInError) throw signInError;
+          if (data && data.user) {
+            sessionStorage.setItem('user', JSON.stringify(data.user));
+            router.push("/map");
+          }
+        }
+      } catch (err: any) {
+        error.value = err.message || "An unexpected error occurred";
+      }
+    };
+
+    const toggleAuthMode = () => {
+      isSignUp.value = !isSignUp.value;
+    };
+
+    return {
+      email,
+      password,
+      error,
+      isSignUp,
+      handleAuth,
+      toggleAuthMode,
+    };
+  },
+});
+</script>
+
+<style scoped>
+input {
+  margin: 0.5rem;
+  padding: 0.5rem;
+  width: 200px;
+}
+button {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+</style>
+```
+
+<Callout type="warning" emoji="⚠️">
+  Remember to handle errors gracefully in your authentication logic to improve user experience.
+</Callout>
+
+## Key Features
+
+1. **Sign-Up and Sign-In Logic**
+   - The `isSignUp` flag toggles between sign-up and sign-in modes.
+   - Uses Geobase client for authentication.
+
+2. **Error Handling**
+   - Displays errors returned during the authentication process.
+   - Catches unexpected issues and displays an appropriate message.
+
+3. **Redirection**
+   - On successful sign-in, users are redirected to the `/map` route.
+   - User information is stored in `sessionStorage` for session management.
+
+## Geobase Client Setup
+
+The Geobase client is initialized in `geobase.ts` using Geobase:
+
+<Callout type="success" emoji="✅">
+  Ensure your Geobase client is correctly configured in `geobase.ts` to avoid authentication issues.
+</Callout>
+
+```ts
+import { createClient } from '@supabase/supabase-js';
+
+const GeobaseUrl = import.meta.env.VITE_Geobase_URL!;
+const GeobaseKey = import.meta.env.VITE_Geobase_ANON_KEY!;
+
+export const Geobase = createClient(GeobaseUrl, GeobaseKey);
+```
+
+## Routing
+
+Routes are defined in `index.ts`:
+
+```ts
+import { createRouter, createWebHistory } from 'vue-router';
+import Home from '../components/Home.vue';
+import MapScreen from '../components/MapScreen.vue';
+
+const routes = [
+  { path: '/', name: 'Home', component: Home },
+  { path: '/map', name: 'MapScreen', component: MapScreen },
+];
+
+const router = createRouter({
+  history: createWebHistory(),
+  routes,
+});
+
+export default router;
+```
+
+## Environment Variables
+
+Ensure the following environment variables are set in your project:
+
+<GettingStarted />
+
+![geobase-auth-flow](https://d2w9rnfcy7mm78.cloudfront.net/33039749/original_ce46b05d765319bafa3d58d7f9c062e5.png?1734418611?bc=0)
+
+## Learn More
+
+- [Geobase Auth Documentation](https://geobase.com/docs/guides/auth)
+- [Vue Router Documentation](https://router.vuejs.org/guide/)
+
+<Callout type="info" emoji="ℹ️">
+  For support and questions, join the [Geobase discord community](https://discord.gg/4susZSj4bd).
+</Callout>
