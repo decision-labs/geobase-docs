@@ -134,7 +134,6 @@ A tile server function is a four-step process. So using the example above, we ca
 | 3     | Filter & transform data (business logic)         | `filtered_data = APPLY_FILTERS_AND_TRANSFORM(data, bounds, optional_filter)` | `mvtgeom AS (SELECT ST_AsMVTGeom(ST_Transform(t.location, 3857), bounds.geom) AS geom, t.park FROM parks t, bounds WHERE ST_Intersects(t.location, ST_Transform(bounds.geom, 4326)) AND upper(t.park) LIKE (upper(name_prefix) \|\| '%')),` |
 | 4     | Generate the vector tile          | `vector_tile = GENERATE_VECTOR_TILE(filtered_data)`    | `SELECT ST_AsMVT(mvtgeom, 'default') FROM mvtgeom;`                                     |
 
-This table maps the function's high-level structure, pseudocode abstraction, and actual implementation side by side.
 
 ## Using Tile Endpoints
 
