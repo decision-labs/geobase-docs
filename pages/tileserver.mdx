@@ -363,6 +363,7 @@ map.on("load", () => {
 
 ## Performance Tips
 
+- Make sure you have spatial indices on geometry columns (`gist` index)
 - Use the `properties` parameter to limit returned attributes
 - Enable caching for static datasets
 - Consider using different zoom level strategies for different data densities
