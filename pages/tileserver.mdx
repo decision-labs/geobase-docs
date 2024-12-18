@@ -130,9 +130,9 @@ A tile server function is a four-step process. So using the example above, we ca
 | **#** | **Purpose**                       | **Pseudocode**                                          | **Actual Code**                                                                                                     |
 |-------|-----------------------------------|--------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------|
 | 1     | Define inputs and outputs         | `DEFINE FUNCTION parks_name(tile_params, optional_filter) RETURNS vector_tile` | ```CREATE OR REPLACE FUNCTION public.parks_name(z integer, x integer, y integer, name_prefix text default 'B') RETURNS bytea AS $$ ``` |
-| 2     | Calculate tile bounds             | `bounds = COMPUTE_TILE_BOUNDS(tile_params)`            | ```WITH bounds AS (SELECT ST_TileEnvelope(z, x, y) AS geom), ```                                               |
-| 3     | Filter & transform data (business logic)         | `filtered_data = APPLY_FILTERS_AND_TRANSFORM(data, bounds, optional_filter)` | ```mvtgeom AS (SELECT ST_AsMVTGeom(ST_Transform(t.location, 3857), bounds.geom) AS geom, t.park FROM parks t, bounds WHERE ST_Intersects(t.location, ST_Transform(bounds.geom, 4326)) AND upper(t.park) LIKE (upper(name_prefix) || '%')), ``` |
-| 4     | Generate the vector tile          | `vector_tile = GENERATE_VECTOR_TILE(filtered_data)`    | ```SELECT ST_AsMVT(mvtgeom, 'default') FROM mvtgeom; $$ LANGUAGE 'sql'; ```                                     |
+| 2     | Calculate tile bounds             | `bounds = COMPUTE_TILE_BOUNDS(tile_params)`            | `WITH bounds AS (SELECT ST_TileEnvelope(z, x, y) AS geom),`                                               |
+| 3     | Filter & transform data (business logic)         | `filtered_data = APPLY_FILTERS_AND_TRANSFORM(data, bounds, optional_filter)` | `mvtgeom AS (SELECT ST_AsMVTGeom(ST_Transform(t.location, 3857), bounds.geom) AS geom, t.park FROM parks t, bounds WHERE ST_Intersects(t.location, ST_Transform(bounds.geom, 4326)) AND upper(t.park) LIKE (upper(name_prefix) \|\| '%')),` |
+| 4     | Generate the vector tile          | `vector_tile = GENERATE_VECTOR_TILE(filtered_data)`    | `SELECT ST_AsMVT(mvtgeom, 'default') FROM mvtgeom;`                                     |
 
 This table maps the function's high-level structure, pseudocode abstraction, and actual implementation side by side.
 
