@@ -125,6 +125,8 @@ COMMENT ON FUNCTION public.parks_name IS 'Filters the parks table by the initial
 
 ### Table: Anatomy of a Tile Server Function
 
+A tile server function is a four-step process:
+
 | **#** | **Purpose**                       | **Pseudocode**                                          | **Actual Code**                                                                                                     |
 |-------|-----------------------------------|--------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------|
 | 1     | Define inputs and outputs         | `DEFINE FUNCTION parks_name(tile_params, optional_filter) RETURNS vector_tile` | ```CREATE OR REPLACE FUNCTION public.parks_name(z integer, x integer, y integer, name_prefix text default 'B') RETURNS bytea AS $$ ``` |
