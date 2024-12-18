@@ -94,50 +94,45 @@ map.on("load", () => {
 });
 ```
 
-Example routing function:
+Example function to query parks:
 
 ```sql
-CREATE OR REPLACE FUNCTION public.get_routing_tiles(
-    z integer,
-    x integer,
-    y integer,
-    start_point geometry = NULL,
-    end_point geometry = NULL
-)
-RETURNS bytea
-LANGUAGE plpgsql
-AS $function$
-DECLARE
-    result bytea;
-BEGIN
-    WITH bounds AS (
-        SELECT ST_TileEnvelope(z, x, y) AS geom
+CREATE OR REPLACE
+FUNCTION public.parks_name(
+            z integer, x integer, y integer, -- tile parameters needed for tile server to know which tiles to request
+            name_prefix text default 'B') -- optional parameter to filter the data by the name prefix
+RETURNS bytea -- returns the vector tiles as a bytea
+AS $$
+    WITH
+    bounds AS (
+      SELECT ST_TileEnvelope(z, x, y) AS geom
+    ), 
+    mvtgeom AS (
+      SELECT ST_AsMVTGeom(ST_Transform(t.location, 3857), bounds.geom) AS geom,
+        t.park
+      FROM parks t, bounds
+      WHERE ST_Intersects(t.location, ST_Transform(bounds.geom, 4326))
+      AND upper(t.park) LIKE (upper(name_prefix) || '%')
     )
-    SELECT ST_AsMVT(tile, 'default')
-    FROM (
-        SELECT
-            ST_AsMVTGeom(
-                route.geometry,
-                bounds.geom,
-                4096,
-                256,
-                true
-            ) AS geom
-        FROM
-            pgr_dijkstra(
-                'SELECT id, source, target, cost FROM roads',
-                nearest_vertex(start_point),
-                nearest_vertex(end_point)
-            ) AS route
-            CROSS JOIN bounds
-        WHERE ST_Intersects(route.geometry, bounds.geom)
-    ) tile
-    INTO result;
+    SELECT ST_AsMVT(mvtgeom, 'default') FROM mvtgeom;
+$$
+LANGUAGE 'sql'
+SET search_path = extensions, public
+STABLE PARALLEL SAFE;
 
-    RETURN result;
-END;
-$function$;
+COMMENT ON FUNCTION public.parks_name IS 'Filters the parks table by the initial letters of the name using the "name_prefix" parameter.';
 ```
+
+### Table: Anatomy of a Tile Server Function
+
+| **#** | **Purpose**                       | **Pseudocode**                                          | **Actual Code**                                                                                                     |
+|-------|-----------------------------------|--------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------|
+| 1     | Define inputs and outputs         | `DEFINE FUNCTION parks_name(tile_params, optional_filter) RETURNS vector_tile` | ```CREATE OR REPLACE FUNCTION public.parks_name(z integer, x integer, y integer, name_prefix text default 'B') RETURNS bytea AS $$ ``` |
+| 2     | Calculate tile bounds             | `bounds = COMPUTE_TILE_BOUNDS(tile_params)`            | ```WITH bounds AS (SELECT ST_TileEnvelope(z, x, y) AS geom), ```                                               |
+| 3     | Filter & transform data (business logic)         | `filtered_data = APPLY_FILTERS_AND_TRANSFORM(data, bounds, optional_filter)` | ```mvtgeom AS (SELECT ST_AsMVTGeom(ST_Transform(t.location, 3857), bounds.geom) AS geom, t.park FROM parks t, bounds WHERE ST_Intersects(t.location, ST_Transform(bounds.geom, 4326)) AND upper(t.park) LIKE (upper(name_prefix) || '%')), ``` |
+| 4     | Generate the vector tile          | `vector_tile = GENERATE_VECTOR_TILE(filtered_data)`    | ```SELECT ST_AsMVT(mvtgeom, 'default') FROM mvtgeom; $$ LANGUAGE 'sql'; ```                                     |
+
+This table maps the function's high-level structure, pseudocode abstraction, and actual implementation side by side.
 
 ## Using Tile Endpoints
 
