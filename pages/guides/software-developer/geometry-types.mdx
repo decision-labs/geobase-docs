@@ -94,3 +94,36 @@ map.addLayer({
     'source-layer': 'layer-name',
 });
 ```
+
+## Multi-geometry tile source with MapLibre
+
+If your table has multiple geometries, you can filter the layer by the geometry type.
+
+```js
+// Point
+map.addLayer({
+    id: 'points-layer',
+    type: 'circle',
+    source: 'data-source',
+    'source-layer': 'layer-name',
+    filter: ["==", "$type", "Point"] // or "==", "$type", "MultiPoint"
+});
+
+// LineString
+map.addLayer({
+    id: 'lines-layer',
+    type: 'line',
+    source: 'data-source',
+    'source-layer': 'layer-name',
+    filter: ["==", "$type", "LineString"]
+});
+
+// Polygon
+map.addLayer({
+    id: 'polygons-layer',
+    type: 'fill',
+    source: 'data-source',
+    'source-layer': 'layer-name',
+    filter: ["==", "$type", "Polygon"] // or "==", "$type", "MultiPolygon"
+});
+```
