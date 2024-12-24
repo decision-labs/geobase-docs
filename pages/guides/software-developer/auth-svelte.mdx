@@ -1,0 +1,159 @@
+import { Callout } from 'nextra/components';
+import GithubLink from '../../../components/github-link';
+import GettingStarted from '../../../components/GettingStartedSvelte.mdx';
+
+# Authentication with SvelteKit and Geobase
+
+
+
+In this guide, we'll walk you through implementing a modern authentication blueprint using SvelteKit and Geobase, featuring server-side session management, protected routes, and secure middleware handling.
+
+![geobase-auth-flow](https://d2w9rnfcy7mm78.cloudfront.net/33186442/original_c955a8c0e37b9f54bd79368ad667ece9.png?1735034129?bc=0https://d2w9rnfcy7mm78.cloudfront.net/33186442/original_c955a8c0e37b9f54bd79368ad667ece9.png?1735034129?bc=0)
+
+## What's Included
+
+This authentication blueprint provides:
+
+- 🔐 Server-side and client-side auth utilities
+- 🚀 Server hooks for session management
+- 🛡️ Protected route handling
+- 🍪 Secure cookie management
+- 📱 SSR-compatible authentication
+
+<Callout type="info" emoji="ℹ️">
+  This implementation uses Geobase's SSR-compatible authentication helpers for optimal security and performance.
+</Callout>
+
+## GitHub Repository
+
+<Callout type="info" emoji="ℹ️">
+  <GithubLink href="https://github.com/decision-labs/auth-geobase-svelte" text="Geobase Svelte Auth Demo Repository"/>
+</Callout>
+
+
+## Authentication Patterns
+
+Geobase Auth can be implemented in several ways:
+
+1. **Server-Side Authentication** (Recommended)
+   - Tokens stored in cookies
+   - Protected API routes
+   - Server-side session verification
+
+2. **Client-Side Authentication**
+   - Browser-based token storage
+   - Real-time subscription support
+   - Instant UI updates
+
+<Callout type="info" emoji="ℹ️">
+  Server-side auth is recommended for better security and SEO optimization.
+</Callout>
+
+## Implementation
+
+### Client Setup
+
+Create a browser client for client-side authentication:
+
+```typescript
+// lib/geobase.ts
+import { createClient } from '@geobase/ssr'
+import { PUBLIC_GEOBASE_URL, PUBLIC_GEOBASE_ANON_KEY } from '$env/static/public'
+
+export const geobase = createClient(
+  PUBLIC_GEOBASE_URL,
+  PUBLIC_GEOBASE_ANON_KEY
+)
+```
+
+### Server Hooks
+
+Set up server-side authentication handling:
+
+```typescript
+// hooks.server.ts
+import { PUBLIC_GEOBASE_URL, PUBLIC_GEOBASE_ANON_KEY } from '$env/static/public'
+import { createServerClient } from '@geobase/ssr'
+import type { Handle } from '@sveltejs/kit'
+
+export const handle: Handle = async ({ event, resolve }) => {
+  event.locals.geobase = createServerClient(
+    PUBLIC_GEOBASE_URL,
+    PUBLIC_GEOBASE_ANON_KEY,
+    {
+      cookies: {
+        get: (key) => event.cookies.get(key),
+        set: (key, value, options) => {
+          event.cookies.set(key, value, options)
+        },
+        remove: (key, options) => {
+          event.cookies.delete(key, options)
+        }
+      }
+    }
+  )
+
+  const {
+    data: { session }
+  } = await event.locals.geobase.auth.getSession()
+  event.locals.session = session
+
+  return resolve(event)
+}
+```
+
+### Protected Routes
+
+Example of a protected route setup:
+
+```typescript
+// routes/private/+page.server.ts
+import { redirect } from '@sveltejs/kit'
+import type { PageServerLoad } from './$types'
+
+export const load: PageServerLoad = async ({ locals }) => {
+  if (!locals.session) {
+    throw redirect(303, '/auth/login')
+  }
+
+  return {
+    user: locals.session.user
+  }
+}
+```
+
+<Callout type="warning" emoji="⚠️">
+  Always verify authentication status on both client and server side for maximum security.
+</Callout>
+
+## Environment Setup
+
+<GettingStarted />
+
+## Best Practices
+
+1. **Cookie Management**
+   - Always return the middleware response object as is
+   - Maintain cookie synchronization between browser and server
+   - Handle cookie operations carefully in Server Components
+
+2. **Session Handling**
+   - Implement proper error handling for auth operations
+   - Use try-catch blocks for cookie operations
+   - Consider middleware refresh patterns for Server Components
+
+3. **Security**
+   - Protect sensitive routes using middleware
+   - Implement proper redirect handling
+   - Maintain secure cookie handling practices
+
+![geobase-auth-flow](https://d2w9rnfcy7mm78.cloudfront.net/33186443/original_82662b1eb1867add8fa38ee0fbd01aa5.png?1735034131?bc=0)
+
+## Learn More
+
+- [Geobase Auth Documentation](https://geobase.com/docs/guides/auth)
+- [SvelteKit Documentation](https://svelte.dev/docs/kit/introduction)
+
+<Callout type="info" emoji="ℹ️">
+  For support and questions, join the [Geobase discord community](https://discord.gg/4susZSj4bd).
+</Callout>
