@@ -25,4 +25,3 @@ This project is licensed under the MIT License.
 ## TODOs
 - Organize Developer Frameworks into a table
 
--trigger-build
