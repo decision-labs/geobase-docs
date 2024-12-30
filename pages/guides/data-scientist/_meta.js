@@ -6,4 +6,5 @@ export default {
 	geopandas: "Geopandas",
 	geoparquet: "Geoparquet",
 	geocoding: "Geocoding",
+	"mobility-analytics": "Mobility Analytics",
 };

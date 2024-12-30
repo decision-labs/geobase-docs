@@ -1,0 +1,125 @@
+#! /usr/bin/env python
+
+import movingpandas as mpd
+import pandas as pd
+import h3
+import opendatasets as od
+import os
+import geopandas as gpd
+from shapely.geometry import Point, Polygon
+from datetime import datetime, timedelta
+from p_tqdm import p_umap
+from tqdm.notebook import tqdm
+tqdm.pandas()
+
+input_file_path = 'taxi-trajectory/train.csv'
+def get_porto_taxi_from_kaggle():
+    if not os.path.exists(input_file_path):
+        od.download("https://www.kaggle.com/datasets/crailtap/taxi-trajectory")
+get_porto_taxi_from_kaggle()
+df = pd.read_csv(input_file_path, nrows=10, usecols=['TRIP_ID', 'TAXI_ID', 'TIMESTAMP', 'MISSING_DATA', 'POLYLINE'])
+
+
+df.POLYLINE = df.POLYLINE.apply(eval)  # Convert polyline string to list
+df = df.query("MISSING_DATA == False")  # Remove missing data records
+df["geo_len"] = df["POLYLINE"].apply(lambda x: len(x))
+df.drop(df[df["geo_len"]==0].index, axis=0, inplace=True)
+print(df.head())
+
+
+
+def unixtime_to_datetime(unix_time):
+    return datetime.fromtimestamp(unix_time)
+
+def compute_datetime(row):
+    unix_time = row['TIMESTAMP']
+    offset = row['running_number'] * timedelta(seconds=15)
+    return unixtime_to_datetime(unix_time) + offset
+
+new_df = df.explode('POLYLINE')
+new_df['geometry'] = new_df['POLYLINE'].apply(Point)
+new_df['running_number'] = new_df.groupby('TRIP_ID').cumcount()
+new_df['datetime'] = new_df.apply(compute_datetime, axis=1)
+new_df.drop(columns=['POLYLINE', 'TIMESTAMP', 'running_number'], inplace=True)
+new_df.head()
+
+
+
+   
+gdf = gpd.GeoDataFrame(new_df, crs=4326)
+trajs = mpd.TrajectoryCollection(gdf, traj_id_col='TRIP_ID', obj_id_col='TAXI_ID', t='datetime')
+
+
+
+   
+cleaned = trajs.copy()
+cleaned = mpd.OutlierCleaner(cleaned).clean(v_max=100, units=("km", "h"))
+cleaned.add_speed(overwrite=True, units=('km', 'h'))
+
+
+
+# Add h3 indices at resolution 8 (you can adjust this resolution as needed)
+gdf['h3'] = gdf.geometry.apply(lambda p: h3.geo_to_h3(p.y, p.x, 9))
+
+h3cells = gdf['h3'].unique().tolist()
+
+polygonise = lambda hex_id: Polygon(
+    h3.h3_to_geo_boundary(hex_id, geo_json=True)
+)
+
+all_polys = gpd.GeoSeries(
+    list(map(polygonise, h3cells)), index=h3cells, 
+    name='geometry', crs="EPSG:4326" )
+
+all_polys = all_polys.reset_index()
+
+
+
+def get_sub_traj(x):
+    results = []
+    tmp = trajs.clip(x[1])
+    if len(tmp.trajectories)>0:
+        for jtraj in tmp.trajectories:
+            results.append([x[0],jtraj])
+    return results
+
+my_values = list(all_polys.values)
+res = p_umap(get_sub_traj, my_values)
+
+def flatten(l):
+    return [[item[0], item[1]] for sublist in l for item in sublist]
+
+tt = pd.DataFrame(flatten(res), columns=['index', 'traj'])
+print(tt.head())
+
+
+
+tt = tt.rename(columns={'index':'h3'}).reset_index()
+tt['st_split'] = tt['traj'].apply(lambda x: mpd.TemporalSplitter(x).split(mode="hour").trajectories)
+st_traj = tt.explode('st_split')
+st_traj.dropna(inplace=True)
+
+
+
+def get_end_day_hour(traj):
+    try:
+        t = traj.get_end_time()
+    except:
+        print(traj)
+    return datetime(t.year, t.month, t.day, t.hour, 0, 0)
+
+st_traj['t'] = st_traj['st_split'].progress_apply(lambda x: get_end_day_hour(x))
+st_traj['duration'] = st_traj['st_split'].progress_apply(lambda x: x.get_duration())
+
+
+
+agg_st_traj = st_traj.groupby(['h3','t'], as_index=False)['duration'].sum()
+agg_st_traj['duration'] = agg_st_traj['duration'].apply(lambda x: x.total_seconds())
+
+agg_st_traj['geometry'] = agg_st_traj['h3'].apply(lambda x: Polygon(h3.h3_to_geo_boundary(x, geo_json=True)))
+print(agg_st_traj.head())
+
+# write out the result to a geojson file
+# convert the dataframe to a geodataframe
+gdf = gpd.GeoDataFrame(agg_st_traj, crs=4326)
+gdf.to_file('taxi-trajectory/agg_st_traj.geojson', driver='GeoJSON')
