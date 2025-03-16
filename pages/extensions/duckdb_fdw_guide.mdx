@@ -181,15 +181,3 @@ SELECT duckdb_check_connection('motherduck_server');
 | `duckdb_refresh_foreign_table(table_name, schema_name DEFAULT 'public')`                     | Refreshes the **imported schema** of a foreign table |
 | `duckdb_change_server_options(server_name, new_token)`                                       | Updates **authentication token** for a server        |
 | `duckdb_check_connection(server_name)`                                                       | Checks **server connectivity**                       |
-
----
-
-## 🚀 Why These Functions?
-
-✅ **Consistency** – Unified naming convention for all DuckDB FDW operations\
-✅ **Automation** – Avoids manual schema imports, drops, and refreshes\
-✅ **Security** – Uses `format()` to prevent SQL injection\
-✅ **Efficiency** – Streamlined operations for managing **DuckDB FDW**
-
-This guide should help streamline your **DuckDB FDW** integration within PostgreSQL. Let me know if you need modifications! 🚀
-
