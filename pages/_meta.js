@@ -3,6 +3,7 @@ export default {
 	"importing-data": "Importing Data",
 	blueprints: "Blueprints",
 	guides: "Guides",
+	extensions: "Extensions",
 	tileserver: "Tile Server",
 	supabase: "Supabase Docs",
 	signup: {

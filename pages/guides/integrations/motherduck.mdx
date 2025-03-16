@@ -64,7 +64,7 @@ In geobase go to SQL Editor and run the following SQL to create a foreign server
 ```sql
 -- Clean up (optional)
 -- DROP EXTENSION if exists duckdb_fdw CASCADE;
--- CREATE EXTENSION IF NOT EXISTS duckdb_fdw; WITH SCHEMA extensions CASCADE;
+-- CREATE EXTENSION IF NOT EXISTS duckdb_fdw WITH SCHEMA extensions CASCADE;
 
 -- Create the foreign server
 DO $$
