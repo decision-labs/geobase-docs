@@ -130,12 +130,12 @@ SELECT * FROM duckdb_list_servers();
 
 ### Function: `duckdb_refresh_foreign_table`
 
-Refreshes the **imported schema** of a foreign table.
+Refreshes the **imported schema** of a foreign table. Note it works by dropping and recreating the foreign table.
 
 #### **Usage**
 
 ```sql
-SELECT duckdb_refresh_foreign_table('hex350_grid_cardio_1920');
+SELECT duckdb_refresh_foreign_table('motherduck_server', 'hex350_grid_cardio_1920', 'public');
 ```
 
 ---
