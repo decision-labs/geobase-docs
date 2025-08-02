@@ -1,0 +1,138 @@
+# Oil Storage Tank Detection
+
+> **Task ID:** `oil-storage-tank-detection`  
+> **Library:** `@geobase-js/geoai`  
+> **Purpose:** Specialized detection of oil storage tanks and fuel storage facilities in satellite and aerial imagery
+
+## Quick Start
+
+```typescript
+import { geoai } from "@geobase-js/geoai";
+
+// Initialize the pipeline
+const tankDetectionInstance = await geoai.pipeline(
+  [
+    {
+      task: "oil-storage-tank-detection",
+    },
+  ],
+  providerParams
+);
+
+// Run inference
+const result = await tankDetectionInstance.inference({
+  inputs: { polygon: myPolygon },
+  mapSourceParams: { zoomLevel: 18 },
+  postProcessingParams: { 
+    confidenceThreshold: 0.7,
+    nmsThreshold: 0.45
+  },
+});
+
+console.log(`Found ${result.detections.features.length} storage tanks`);
+```
+
+## Available Models
+
+| Model ID | Description | Best Use Case |
+|----------|-------------|---------------|
+| [geobase/oil-storage-tank-detection/oil_storage_tank_yolox_quantized](https://huggingface.co/geobase/oil-storage-tank-detection) | YOLOX model specialized for industrial tank detection | Industrial monitoring, environmental compliance, security analysis |
+
+## Capabilities
+
+- ✅ **Industrial tank detection** - Oil, fuel, and chemical storage tanks
+- ✅ **Multi-scale analysis** - From small fuel tanks to large industrial storage
+- ✅ **Facility monitoring** - Refineries, terminals, and industrial complexes
+- ✅ **High-resolution support** - Optimized for 30cm-1m resolution imagery
+- ✅ **Confidence scoring** - Each detection includes confidence scores
+- ✅ **NMS post-processing** - Advanced Non-Maximum Suppression for dense facilities
+- ✅ **Geospatial integration** - Native GeoJSON output with geographic coordinates
+
+## Input Parameters
+
+### Required Inputs
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `polygon` | `GeoJSON.Feature<Polygon>` | Industrial area of interest for tank detection |
+
+### Post Processing Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `confidenceThreshold` | `number` | `0.5` | Minimum confidence threshold (0-1) |
+| `nmsThreshold` | `number` | `0.3` | Non-Maximum Suppression IoU threshold |
+
+<!-- Todo : update the map source guide link -->
+### Map Source Parameters
+Follow this guide for mapSourceParameters 
+
+## Output Format
+
+```typescript
+interface ObjectDetectionResults {
+  detections: GeoJSON.FeatureCollection;
+  geoRawImage: GeoRawImage;
+}
+```
+
+### Detection Feature Properties
+
+```typescript
+interface DetectionProperties {
+  confidence: number;           // Detection confidence (0-1)
+}
+```
+
+## Detected Classes
+
+| Class | Description | Typical Use Cases |
+|-------|-------------|-------------------|
+| `Storage Tank` | Cylindrical oil, fuel, and chemical storage tanks | Industrial monitoring, environmental compliance, capacity assessment |
+
+
+## Best Practices
+
+### 🎯 **Optimal Use Cases**
+
+- Industrial facility monitoring
+- Environmental compliance assessment
+- Oil spill risk evaluation
+- Strategic asset monitoring
+- Energy infrastructure mapping
+- Security and surveillance
+
+### ⚡ **Performance Tips**
+
+```typescript
+// Adjust parameters for different tank sizes
+postProcessingParams: { 
+  confidenceThreshold: 0.8,
+  nmsThreshold: 0.3 
+} // Large industrial tanks only
+
+postProcessingParams: { 
+  confidenceThreshold: 0.6,
+  nmsThreshold: 0.5 
+} // Include smaller fuel tanks
+
+// Optimal zoom levels for different scenarios
+mapSourceParams: { zoomLevel: 18 } // Standard industrial facility analysis
+mapSourceParams: { zoomLevel: 17 } // Large refinery complex overview
+mapSourceParams: { zoomLevel: 19 } // Small tank farm detailed analysis
+```
+
+## Common Issues & Solutions
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| Missing small tanks | Low resolution or high confidence | Increase zoom to 19 and lower confidence to 0.6 |
+| False positives (silos, buildings) | Similar circular structures | Increase confidence to 0.8+ and validate with contextual analysis |
+| Overlapping detections | Dense tank farms | Adjust NMS threshold to 0.3-0.4 |
+| Poor detection on industrial platforms | Complex backgrounds | Use higher resolution imagery and lower confidence |
+| Missing tanks with unusual shapes | Non-cylindrical tanks | Consider using general object detection for special cases |
+
+
+## Related Tasks
+
+- [`object-detection`](./object-detection.md) - General-purpose object detection including industrial structures

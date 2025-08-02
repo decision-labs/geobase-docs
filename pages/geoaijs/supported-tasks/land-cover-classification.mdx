@@ -1,0 +1,128 @@
+# Land Cover Classification
+
+> **Task ID:** `land-cover-classification`  
+> **Library:** `@geobase-js/geoai`  
+> **Purpose:** Classify land cover types across satellite and aerial imagery for environmental monitoring and planning
+
+## Quick Start
+
+```typescript
+import { geoai } from "@geobase-js/geoai";
+
+// Initialize the pipeline
+const landCoverInstance = await geoai.pipeline(
+  [
+    {
+      task: "land-cover-classification",
+    },
+  ],
+  providerParams
+);
+
+// Run inference
+const result = await landCoverInstance.inference({
+  inputs: { polygon: myPolygon },
+  mapSourceParams: { zoomLevel: 15 },
+  postProcessingParams: { minArea: 20 },
+});
+
+console.log(`Classified ${result.classifications.features.length} land cover areas`);
+```
+
+## Available Models
+
+| Model ID | Description | Best Use Case |
+|----------|-------------|---------------|
+| [geobase/sparsemask](https://huggingface.co/geobase/sparsemask) | SparseMask segmentation model for multi-class land cover | Regional planning, environmental monitoring, agricultural assessment |
+
+## Capabilities
+
+- ✅ **Multi-class land cover** - Forest, agriculture, urban, water, and other major land cover types
+- ✅ **Regional scale analysis** - Efficient processing of large geographic areas
+- ✅ **High-resolution classification** - Effective at 10m-30m resolution imagery
+- ✅ **Temporal analysis** - Support for change detection over time
+- ✅ **Geospatial integration** - Native GeoJSON output with land cover polygons
+- ✅ **Environmental compliance** - Supports land use planning and monitoring
+
+## Input Parameters
+
+### Required Inputs
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `polygon` | `GeoJSON.Feature<Polygon>` | Area of interest for land cover classification |
+
+### Post Processing Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `minArea` | `number` | `20` | Minimum area threshold |
+
+<!-- Todo : update the map source guide link -->
+### Map Source Parameters
+Follow this guide for mapSourceParameters 
+
+## Output Format
+
+```typescript
+interface LandCoverResults {
+  detections: GeoJSON.FeatureCollection; // Land cover classification polygons
+  binaryMasks, // binary mask for each class
+  outputImage: GeoRawImage; // output landcover classification image
+}
+```
+
+### Classification Feature Properties
+
+```typescript
+interface LandCoverProperties {
+  class: string;        // Land cover class name
+}
+```
+
+## Land Cover Classes
+
+| Class | Description | Typical Use Cases |
+|-------|-------------|-------------------|
+| `bareland` | Exposed soil, rock, and sparsely vegetated areas | Erosion monitoring, construction sites, mining impacts |
+| `rangeland` | Natural grasslands, pastures, and grazing areas | Livestock management, conservation planning, carbon sequestration |
+| `developed space` | Built-up urban areas including residential and commercial zones | Urban planning, population analysis, infrastructure development |
+| `road` | Transportation infrastructure and paved surfaces | Transportation planning, infrastructure mapping, urban connectivity |
+| `tree` | Forested areas including deciduous, coniferous, and mixed forests | Carbon assessment, biodiversity monitoring, deforestation tracking |
+| `water` | Water bodies including lakes, rivers, and coastal waters | Water resource management, flood monitoring, aquatic habitat assessment |
+| `agriculture land` | Cultivated areas including crops and managed agricultural land | Agricultural productivity, food security, irrigation planning |
+| `buildings` | Individual building structures and built infrastructure | Building density analysis, urban development, property assessment |
+
+
+## Best Practices
+
+### 🎯 **Optimal Use Cases**
+
+- Regional land use planning
+- Environmental impact assessment
+- Agricultural monitoring
+- Urban growth analysis
+- Climate change studies
+- Natural resource management
+
+### ⚡ **Performance Tips**
+
+```typescript
+// Optimal zoom levels for different scenarios
+mapSourceParams: { zoomLevel: 15 } // Detailed land cover mapping
+mapSourceParams: { zoomLevel: 14 } // Regional assessments
+mapSourceParams: { zoomLevel: 16 } // Urban-rural interface analysis
+```
+## Common Issues & Solutions
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| Mixed pixel classification | Low resolution imagery | Use higher resolution imagery (zoom level 16+) |
+| Water body misclassification | Shadows or seasonal water levels | Use multiple dates and validate with known water bodies |
+
+## Related Tasks
+
+- [`wetland-segmentation`](./wetland-segmentation.md) - Detailed wetland mapping within land cover context
+- [`building-detection`](./building-detection.md) - Identify built areas within urban land cover
+- [`object-detection`](./object-detection.md) - Detect specific features within land cover classes
+- [`solar-panel-detection`](./solar-panel-detection.md) - Identify renewable energy within developed areas

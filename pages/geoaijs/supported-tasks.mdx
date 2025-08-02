@@ -1,0 +1,69 @@
+# AI Tasks
+
+Comprehensive documentation for each AI task supported by GeoAI.js, including usage examples, parameter details, performance characteristics, and best practices.
+
+## What You'll Find
+
+This section provides detailed guides for all available AI tasks, from general object detection to specialized remote sensing applications. Each task is documented with practical examples, performance metrics, and implementation guidance.
+
+## Available Tasks
+
+### Generic Tasks
+
+| Task | Purpose | Use Cases |
+|------|---------|-----------|
+| [Object Detection](./supported-tasks/object-detection.md) | General-purpose object detection | Roads, buildings, vehicles |
+| [Zero-Shot Object Detection](./supported-tasks/zero-shot-object-detection.md) | Custom object class detection | Custom objects without training |
+| [Oriented Object Detection](./supported-tasks/oriented-object-detection.md) | Rotated object detection | Ships, aircraft, rotated structures |
+| [Mask Generation](./supported-tasks/mask-generation.md) | Generate precise object masks | Detailed boundary extraction |
+| [Land Cover Classification](./supported-tasks/land-cover-classification.md) | Land use categorization | Environmental analysis, planning |
+
+### Specific Tasks
+
+| Task | Purpose | Use Cases |
+|------|---------|-----------|
+| [Car Detection](./supported-tasks/car-detection.md) | Specialized vehicle detection | Traffic analysis, parking lots |
+| [Ship Detection](./supported-tasks/ship-detection.md) | Maritime vessel detection | Port monitoring, maritime surveillance |
+| [Building Detection](./supported-tasks/building-detection.md) | Building-specific detection | Urban planning, infrastructure |
+| [Solar Panel Detection](./supported-tasks/solar-panel-detection.md) | Solar installation detection | Renewable energy assessment |
+| [Oil Storage Tank Detection](./supported-tasks/oil-storage-tank-detection.md) | Industrial tank detection | Infrastructure monitoring |
+| [Building Footprint Segmentation](./supported-tasks/building-footprint-segmentation.md) | Building boundary extraction | Urban mapping, property analysis |
+| [Wetland Segmentation](./supported-tasks/wetland-segmentation.md) | Wetland area identification | Environmental monitoring |
+
+
+## Getting Started
+
+Choose a task based on your specific needs:
+
+1. **General Object Detection** - Start with [Object Detection](./object-detection.md) for basic use cases
+2. **Custom Objects** - Use [Zero-Shot Object Detection](./zero-shot-object-detection.md) for objects not in standard datasets
+3. **Precise Boundaries** - Try [Mask Generation](./mask-generation.md) when you need exact object outlines
+4. **Specialized Detection** - Select task-specific models for optimal performance
+
+## Documentation Structure
+
+Each task documentation includes:
+
+- **Quick Start** - Minimal code example to get started immediately
+- **Available Models** - Model variants and their specific use cases  
+- **Capabilities** - Detailed breakdown of what the model can detect
+- **Parameters** - Complete input/output parameters and configuration options
+- **Best Practices** - Optimization tips and recommended patterns
+- **Troubleshooting** - Common issues and their solutions
+
+## Next Steps
+
+- Start with the [Object Detection](./supported-tasks/object-detection.md) tutorial if you're new to GeoAI.js
+- Explore our [API Reference](/geoaijs/api-reference) for detailed technical documentation
+- Check out [Performance Optimization](/geoaijs/guides/performance-optimization.md) for production tips
+
+## Contributing to Documentation
+
+When adding new task documentation:
+
+1. Use the [object-detection.md](./object-detection.md) file as a template
+2. Follow the established structure and formatting guidelines
+3. Include comprehensive performance metrics and practical examples
+4. Add cross-references to related models and tasks
+5. Update this README with the new task entry in the appropriate table
+

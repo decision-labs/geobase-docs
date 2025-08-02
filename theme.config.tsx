@@ -36,6 +36,9 @@ const config = {
 	footer: {
 		content: `Geobase.app © ${new Date().getFullYear()}`,
 	},
+	sidebar: {
+		defaultMenuCollapseLevel: 1
+	}
 };
 
 export default config;

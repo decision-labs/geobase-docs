@@ -1,0 +1,120 @@
+# Wetland Segmentation
+
+> **Task ID:** `wetland-segmentation`  
+> **Library:** `@geobase-js/geoai`  
+> **Purpose:** Identify and segment wetland areas in satellite and aerial imagery for environmental monitoring
+
+## Quick Start
+
+```typescript
+import { geoai } from "@geobase-js/geoai";
+
+// Initialize the pipeline
+const wetlandInstance = await geoai.pipeline(
+  [
+    {
+      task: "wetland-segmentation",
+    },
+  ],
+  providerParams
+);
+
+// Run inference
+const result = await wetlandInstance.inference({
+  inputs: { polygon: myPolygon },
+  mapSourceParams: { zoomLevel: 16 },
+});
+
+console.log(`Identified ${result.detections.features.length} wetland areas`);
+```
+
+## Available Models
+
+| Model ID | Description | Best Use Case |
+|----------|-------------|---------------|
+| [geobase/geoai_models/wetland_detection_quantized](https://huggingface.co/geobase/geoai_models) | Quantized segmentation model for wetland identification | Environmental monitoring, conservation planning, regulatory compliance |
+
+## Capabilities
+
+- ✅ **Wetland identification** - Various wetland types including marshes, swamps, bogs
+- ✅ **Precise boundary detection** - Accurate wetland-upland boundaries
+- ✅ **Multi-seasonal analysis** - Works across different seasons and water levels
+- ✅ **High-resolution support** - Effective at 1-10m resolution imagery
+- ✅ **Confidence scoring** - Each segmentation includes confidence scores
+- ✅ **Geospatial integration** - Native GeoJSON polygon output
+
+## Input Parameters
+
+### Required Inputs
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `polygon` | `GeoJSON.Feature<Polygon>` | Area of interest for wetland identification |
+
+<!-- Todo : update the map source guide link -->
+### Map Source Parameters
+Follow this guide for mapSourceParameters 
+
+#### Multi-spectral Band Configuration
+The wetland segmentation model **requires 4-band RGB + NIR imagery** and will not function with standard 3-band RGB imagery:
+
+```typescript
+// Example with NIR band for enhanced vegetation analysis
+const result = await wetlandInstance.inference({
+  inputs: { polygon: myPolygon },
+  mapSourceParams: { 
+    zoomLevel: 16,
+    bands: [1, 2, 3, 4] // RGB + NIR bands - all 4 bands required
+  }
+});
+```
+
+> ⚠️ **Important:** This model only works with 4-band imagery. Standard RGB (3-band) imagery is not supported.
+
+| Band | Type |
+|------|------|
+| Band 1 | Red |
+| Band 2 | Green |
+| Band 3 | Blue |
+| Band 4 | NIR |
+
+## Output Format
+
+```typescript
+interface ObjectDetectionResults {
+  detections: GeoJSON.FeatureCollection; // Wetland area polygons
+  geoRawImage: GeoRawImage;
+}
+```
+
+## Detected Classes
+
+| Class | Description | Typical Use Cases |
+|-------|-------------|-------------------|
+| `Wetland` | Natural and constructed wetland areas | Environmental assessment, conservation planning, regulatory compliance |
+
+## Best Practices
+
+### 🎯 **Optimal Use Cases**
+
+- Environmental impact assessments
+- Wetland delineation for permits
+- Conservation area mapping
+- Flood risk assessment
+- Biodiversity habitat analysis
+- Climate change monitoring
+
+### ⚡ **Performance Tips**
+
+```typescript
+// Optimal zoom levels for different scenarios
+mapSourceParams: { zoomLevel: 16 } // Regional wetland surveys
+mapSourceParams: { zoomLevel: 15 } // Landscape-scale analysis
+mapSourceParams: { zoomLevel: 17 } // Detailed wetland delineation
+```
+
+## Related Tasks
+
+- [`land-cover-classification`](./land-cover-classification.md) - Classify broader landscape context
+- [`mask-generation`](./mask-generation.md) - Generate precise wetland boundaries
+- [`object-detection`](./object-detection.md) - Detect associated features like buildings

@@ -1,0 +1,150 @@
+# Object Detection
+
+> **Task ID:** `object-detection`  
+> **Library:** `@geobase-js/geoai`  
+> **Purpose:** General-purpose object detection for common infrastructure and objects
+
+
+## Quick Start
+
+```typescript
+import { geoai } from "@geobase-js/geoai";
+
+// Initialize the pipeline
+const objectDetectionInstance = await geoai.pipeline(
+  [
+    {
+      task: "object-detection",
+      modelId: "geobase/WALDO30_yolov8m_640x640", // optional
+    },
+  ],
+  providerParams
+);
+
+// Run inference
+const result = await objectDetectionInstance.inference({
+  inputs: { polygon: myPolygon },
+  mapSourceParams: { zoomLevel: 18 },
+  postProcessingParams: { confidence: 0.8 },
+});
+
+console.log(`Found ${result.detections.features.length} objects`);
+```
+
+## Available Models
+
+| Model ID | Description | Best Use Case |
+|----------|-------------|---------------|
+| [geobase/WALDO30_yolov8m_640x640](https://huggingface.co/geobase/WALDO30_yolov8m_640x640) | YOLOv8 medium model trained on WALDO30 dataset | Urban infrastructure analysis |
+
+## Capabilities
+
+- ✅ **Multi-class detection** - 12 object classes including vehicles, buildings, and infrastructure
+- ✅ **High-resolution support** - Optimized for 15-20cm resolution satellite/aerial imagery
+- ✅ **Confidence scoring** - Each detection includes confidence scores for quality filtering
+- ✅ **Geospatial integration** - Native GeoJSON output with geographic coordinates
+- ✅ **Pipeline chaining** - Compatible with segmentation and classification tasks
+
+## Input Parameters
+
+### Required Inputs
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `polygon` | `GeoJSON.Feature<Polygon>` | Area of interest for object detection |
+
+
+### Post Processing Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `confidence` | `number` | `0.9` | Minimum confidence threshold (0-1) |
+
+<!-- Todo : update the map source guide link -->
+### Map Source Parameters
+Follow this guide for mapSourceParameters 
+## Output Format
+
+```typescript
+interface ObjectDetectionResults {
+  detections: GeoJSON.FeatureCollection;
+  geoRawImage: GeoRawImage;
+}
+```
+
+### Detection Feature Properties
+
+```typescript
+interface DetectionProperties {
+  class: string;        // Object class name
+  confidence: number;   // Detection confidence (0-1)
+}
+```
+
+## Detected Object Classes
+
+| Class | Description | Typical Use Cases |
+|-------|-------------|-------------------|
+| `LightVehicle` | Cars and light trucks | Traffic analysis, parking assessment |
+| `Person` | Individual people | Crowd monitoring, activity analysis |
+| `Building` | Residential and commercial buildings | Urban planning, damage assessment |
+| `UPole` | Utility poles and posts | Infrastructure inventory |
+| `Boat` | Boats and watercraft | Marine traffic, port activity |
+| `Bike` | Bicycles and motorcycles | Transportation analysis |
+| `Container` | Shipping containers and storage units | Logistics, port operations |
+| `Truck` | Heavy trucks and commercial vehicles | Commercial traffic analysis |
+| `Gastank` | Gas tanks and fuel storage | Industrial monitoring |
+| `Digger` | Excavators and construction equipment | Construction monitoring |
+| `SolarPanels` | Solar panel installations | Renewable energy assessment |
+| `Bus` | Buses and public transportation | Public transit analysis |
+
+
+## Best Practices
+
+### 🎯 **Optimal Use Cases**
+
+- Urban infrastructure analysis
+- Traffic and transportation studies
+- Emergency response planning
+- Construction site monitoring
+
+### ⚡ **Performance Tips**
+
+```typescript
+// Use appropriate confidence threshold
+postProcessingParams: { confidence: 0.8 } // Higher = fewer false positives
+
+// Optimal zoom level for your use case
+mapSourceParams: { zoomLevel: 18 } // 18-20 for high detail, 16-17 for broader coverage
+
+```
+<!-- // Process large areas in tiles
+const tiles = divideLargePolygon(polygon, maxArea: 2); // 2km² chunks -->
+
+### 🔗 **Pipeline Chaining**
+
+Object detection works well with other tasks:
+
+```typescript
+// Detection + Segmentation
+const pipeline = await geoai.pipeline([
+  { task: "object-detection" },
+  { task: "mask-generation" }
+], providerParams);
+```
+
+## Common Issues & Solutions
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| Low detection count | Confidence too high | Lower `confidence` parameter to 0.7-0.8 |
+| Many false positives | Confidence too low | Increase `confidence` parameter to 0.85-0.95 |
+| Poor performance | Large area | Split polygon into smaller tiles |
+| Missing small objects | Low resolution | Increase `zoomLevel` to 19-20 |
+
+## Related Tasks
+
+- [`zero-shot-object-detection`](./zero-shot-object-detection.md) - Detect custom object classes
+- [`oriented-object-detection`](./oriented-object-detection.md) - Detect rotated objects  
+<!-- - [`mask-generation`](./mask-generation.md) - Generate precise object masks -->
+- [`building-detection`](./building-detection.md) - Specialized building detection

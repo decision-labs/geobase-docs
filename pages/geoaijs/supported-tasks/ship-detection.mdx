@@ -1,0 +1,99 @@
+# Ship Detection
+
+> **Task ID:** `ship-detection`  
+> **Library:** `@geobase-js/geoai`  
+> **Purpose:** Specialized detection of maritime vessels and ships in satellite and aerial imagery
+
+## Quick Start
+
+```typescript
+import { geoai } from "@geobase-js/geoai";
+
+// Initialize the pipeline
+const shipDetectionInstance = await geoai.pipeline(
+  [
+    {
+      task: "ship-detection",
+    },
+  ],
+  providerParams
+);
+
+// Run inference
+const result = await shipDetectionInstance.inference({
+  inputs: { polygon: myPolygon },
+  mapSourceParams: { zoomLevel: 17 },
+});
+
+console.log(`Found ${result.detections.features.length} ships`);
+```
+
+## Available Models
+
+| Model ID | Description | Best Use Case |
+|----------|-------------|---------------|
+| [geobase/geoai_models/shipDetection_quantized](https://huggingface.co/geobase/geoai_models) | Quantized model trained on maritime datasets | Maritime traffic monitoring, port analysis |
+
+## Capabilities
+
+- ✅ **Maritime vessel detection** - Optimized for ships of various sizes
+- ✅ **Multi-scale detection** - From small boats to large cargo vessels
+- ✅ **Port and open water** - Works in harbors, ports, and open ocean
+- ✅ **High-resolution support** - Effective at 50cm-2m resolution imagery
+- ✅ **Geospatial integration** - Native GeoJSON output with geographic coordinates
+- ✅ **Quantized model** - Optimized for fast inference and reduced memory usage
+
+## Input Parameters
+
+### Required Inputs
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `polygon` | `GeoJSON.Feature<Polygon>` | Maritime area of interest for ship detection |
+
+
+<!-- Todo : update the map source guide link -->
+### Map Source Parameters
+Follow this guide for mapSourceParameters 
+
+## Output Format
+
+```typescript
+interface ObjectDetectionResults {
+  detections: GeoJSON.FeatureCollection;
+  geoRawImage: GeoRawImage;
+}
+```
+
+## Detected Classes
+
+| Class | Description | Typical Use Cases |
+|-------|-------------|-------------------|
+| `Ship` | All types of maritime vessels | Port monitoring, maritime traffic analysis, security surveillance |
+
+
+## Best Practices
+
+### 🎯 **Optimal Use Cases**
+
+- Port and harbor monitoring
+- Maritime traffic analysis
+- Illegal fishing detection
+- Search and rescue operations
+- Shipping route analysis
+- Naval surveillance
+
+### ⚡ **Performance Tips**
+
+```typescript
+// Optimal zoom levels for different scenarios
+mapSourceParams: { zoomLevel: 17 } // Harbor and port monitoring
+mapSourceParams: { zoomLevel: 16 } // Open ocean surveillance
+mapSourceParams: { zoomLevel: 18 } // Small vessel detection
+```
+## Related Tasks
+
+- [`object-detection`](./object-detection.md) - General-purpose object detection including maritime objects
+- [`oriented-object-detection`](./oriented-object-detection.md) - Detect ships with orientation information
+- [`mask-generation`](./mask-generation.md) - Generate precise vessel boundaries for size analysis
+- [`car-detection`](./car-detection.md) - Specialized land vehicle detection

@@ -18,4 +18,9 @@ export default {
 		href: "https://geobase.app/blog",
 		newWindow: true,
 	},
+    '###': {
+        type: 'separator',
+        title: 'Geo AI' // Title is optional
+    },
+    "geoaijs": "GeoAI-js",  
 };

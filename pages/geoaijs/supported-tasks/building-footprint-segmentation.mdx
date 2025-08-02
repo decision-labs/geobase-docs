@@ -1,0 +1,314 @@
+# Building Footprint Segmentation
+
+> **Task ID:** `building-footprint-segmentation`  
+> **Library:** `@geobase-js/geoai`  
+> **Purpose:** Extract precise building boundaries and footprints from satellite and aerial imagery
+
+## Quick Start
+
+```typescript
+import { geoai } from "@geobase-js/geoai";
+
+// Initialize the pipeline
+const footprintInstance = await geoai.pipeline(
+  [
+    {
+      task: "building-footprint-segmentation",
+    },
+  ],
+  providerParams
+);
+
+// Run inference
+const result = await footprintInstance.inference({
+  inputs: { polygon: myPolygon },
+  mapSourceParams: { zoomLevel: 18 },
+  postProcessingParams: { 
+    confidenceThreshold: 0.7,
+    minArea: 25 // depends on how much area 1 pixel covers
+  },
+});
+
+console.log(`Extracted ${result.detections.features.length} building footprints`);
+```
+
+## Available Models
+
+| Model ID | Description | Best Use Case |
+|----------|-------------|---------------|
+| [geobase/building_footprint_segmentation](https://huggingface.co/geobase/building_footprint_segmentation) | Segmentation model for precise building boundary extraction | Urban planning, property mapping, cadastral updates |
+
+## Capabilities
+
+- ✅ **Precise boundary extraction** - Pixel-level accuracy for building footprints
+- ✅ **Complex building shapes** - Handles irregular and complex building geometries
+- ✅ **Multi-story building support** - Extracts footprints regardless of building height
+- ✅ **High-resolution support** - Optimized for 15-50cm resolution imagery
+- ✅ **Confidence scoring** - Each segmentation includes confidence scores
+- ✅ **Area filtering** - Remove small artifacts with minimum area thresholds
+- ✅ **Geospatial integration** - Native GeoJSON polygon output
+
+## Input Parameters
+
+### Required Inputs
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `polygon` | `GeoJSON.Feature<Polygon>` | Area of interest for building footprint extraction |
+
+### Post Processing Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `confidenceThreshold` | `number` | `0.7` | Minimum confidence threshold (0-1) |
+| `minArea` | `number` | `25` | Minimum building area in square meters |
+
+<!-- Todo : update the map source guide link -->
+### Map Source Parameters
+Follow this guide for mapSourceParameters 
+
+## Output Format
+
+```typescript
+interface ObjectDetectionResults {
+  detections: GeoJSON.FeatureCollection; // Building footprint polygons
+  geoRawImage: GeoRawImage;
+}
+```
+
+## Detected Classes
+
+| Class | Description | Typical Use Cases |
+|-------|-------------|-------------------|
+| `Building Footprint` | Precise building boundary polygons | Property mapping, urban planning, tax assessment, construction monitoring |
+
+## Best Practices
+
+### 🎯 **Optimal Use Cases**
+
+- Cadastral mapping and updates
+- Property boundary verification
+- Urban development planning
+- Building area calculations
+- Construction progress monitoring
+- Insurance property assessment
+
+### ⚡ **Performance Tips**
+
+```typescript
+// Adjust parameters for different building densities
+postProcessingParams: { 
+  confidenceThreshold: 0.8,
+  minArea: 50 
+} // Dense urban areas, larger buildings only
+
+postProcessingParams: { 
+  confidenceThreshold: 0.6,
+  minArea: 15 
+} // Rural areas, include smaller structures
+
+// Optimal zoom levels for different scenarios
+mapSourceParams: { zoomLevel: 19 } // Precise boundary extraction
+mapSourceParams: { zoomLevel: 18 } // Good balance of precision and coverage
+mapSourceParams: { zoomLevel: 20 } // Maximum detail for complex buildings
+```
+
+### 🏗️ **Building Type Considerations**
+
+- **Residential:** Excellent for houses with clear rooflines
+- **Commercial:** Very good for large retail and office buildings
+- **Industrial:** Good for warehouses and simple industrial structures
+- **Complex buildings:** May require multiple processing passes
+<!-- 
+## Example Use Cases
+
+### Cadastral Mapping
+```typescript
+// Extract building footprints for property mapping
+const propertyPolygon = createPropertyBounds();
+const result = await footprintInstance.inference({
+  inputs: { polygon: propertyPolygon },
+  mapSourceParams: { zoomLevel: 19 },
+  postProcessingParams: { 
+    confidenceThreshold: 0.8,
+    minArea: 20
+  }
+});
+
+const propertyAnalysis = {
+  buildingCount: result.detections.features.length,
+  totalBuildingArea: result.detections.features.reduce(
+    (sum, building) => sum + building.properties.area, 0
+  ),
+  buildingCoverage: calculateCoverageRatio(result.detections, propertyPolygon),
+  largestBuilding: findLargestBuilding(result.detections.features)
+};
+```
+
+### Urban Development Planning
+```typescript
+// Analyze existing building footprints for development planning
+const developmentArea = createDevelopmentBounds();
+const result = await footprintInstance.inference({
+  inputs: { polygon: developmentArea },
+  mapSourceParams: { zoomLevel: 18 },
+  postProcessingParams: { 
+    confidenceThreshold: 0.75,
+    minArea: 30
+  }
+});
+
+const developmentAnalysis = {
+  existingBuildingDensity: result.detections.features.length / calculateAreaKm2(developmentArea),
+  developableArea: calculateDevelopableArea(developmentArea, result.detections),
+  setbackCompliance: checkSetbackRequirements(result.detections, developmentArea),
+  zoningSummary: analyzeZoningCompliance(result.detections)
+};
+```
+
+### Construction Monitoring
+```typescript
+// Monitor construction progress over time
+const constructionSite = createConstructionBounds();
+const [beforeConstruction, afterConstruction] = await Promise.all([
+  footprintInstance.inference({
+    inputs: { polygon: constructionSite },
+    mapSourceParams: { 
+      zoomLevel: 19,
+      timestamp: "before-construction"
+    }
+  }),
+  footprintInstance.inference({
+    inputs: { polygon: constructionSite },
+    mapSourceParams: { 
+      zoomLevel: 19,
+      timestamp: "after-construction"
+    }
+  })
+]);
+
+const constructionProgress = {
+  originalBuildingCount: beforeConstruction.detections.features.length,
+  currentBuildingCount: afterConstruction.detections.features.length,
+  newConstructionArea: calculateNewBuildingArea(beforeConstruction.detections, afterConstruction.detections),
+  demolishedArea: calculateDemolishedArea(beforeConstruction.detections, afterConstruction.detections)
+};
+```
+
+### Property Assessment
+```typescript
+// Calculate property metrics for assessment purposes
+const assessmentArea = createAssessmentBounds();
+const result = await footprintInstance.inference({
+  inputs: { polygon: assessmentArea },
+  mapSourceParams: { zoomLevel: 19 },
+  postProcessingParams: { 
+    confidenceThreshold: 0.8,
+    minArea: 25
+  }
+});
+
+const propertyMetrics = result.detections.features.map(building => ({
+  footprintArea: building.properties.area,
+  perimeter: calculatePerimeter(building.geometry),
+  shapeComplexity: calculateShapeComplexity(building.geometry),
+  orientation: calculateBuildingOrientation(building.geometry),
+  estimatedFloors: estimateFloorCount(building.properties.area),
+  propertyValue: estimatePropertyValue(building)
+}));
+```
+
+## Advanced Features
+
+### Building Shape Analysis
+```typescript
+// Analyze building geometry characteristics
+const analyzeBuildingShapes = (footprints: GeoJSON.FeatureCollection) => {
+  return footprints.features.map(building => {
+    const area = building.properties.area;
+    const perimeter = calculatePerimeter(building.geometry);
+    const boundingBox = getBoundingBox(building.geometry);
+    
+    return {
+      ...building,
+      properties: {
+        ...building.properties,
+        compactness: (4 * Math.PI * area) / (perimeter * perimeter),
+        rectangularity: area / calculateBoundingBoxArea(boundingBox),
+        elongation: calculateElongationRatio(boundingBox),
+        complexity: calculateVertexComplexity(building.geometry)
+      }
+    };
+  });
+};
+```
+
+### Footprint Simplification
+```typescript
+// Simplify building footprints for different use cases
+const simplifyFootprints = (footprints: GeoJSON.FeatureCollection, tolerance: number) => {
+  return {
+    type: "FeatureCollection",
+    features: footprints.features.map(building => ({
+      ...building,
+      geometry: simplifyPolygon(building.geometry, tolerance)
+    }))
+  };
+};
+
+// Different simplification levels
+const simplified = {
+  high_detail: simplifyFootprints(result.detections, 0.1), // 10cm tolerance
+  medium_detail: simplifyFootprints(result.detections, 0.5), // 50cm tolerance
+  low_detail: simplifyFootprints(result.detections, 1.0)  // 1m tolerance
+};
+```
+
+### Quality Assessment
+```typescript
+// Assess footprint quality and reliability
+const assessFootprintQuality = (footprints: GeoJSON.FeatureCollection) => {
+  return footprints.features.map(building => {
+    const area = building.properties.area;
+    const confidence = building.properties.confidence;
+    const perimeter = calculatePerimeter(building.geometry);
+    const vertices = getVertexCount(building.geometry);
+    
+    let qualityScore = confidence * 0.4; // Base confidence
+    
+    // Penalize very small or very large buildings
+    if (area > 50 && area < 5000) qualityScore += 0.2;
+    
+    // Reward reasonable vertex counts
+    if (vertices >= 4 && vertices <= 20) qualityScore += 0.2;
+    
+    // Penalize highly irregular shapes
+    const compactness = (4 * Math.PI * area) / (perimeter * perimeter);
+    if (compactness > 0.3) qualityScore += 0.2;
+    
+    return {
+      ...building,
+      properties: {
+        ...building.properties,
+        qualityScore: Math.min(1.0, qualityScore)
+      }
+    };
+  });
+};
+``` -->
+
+## Common Issues & Solutions
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| Fragmented building footprints | Complex building shapes or shadows | Lower confidence threshold and merge nearby polygons |
+| Missing small buildings | High minimum area threshold | Reduce minArea parameter to 10-15 m² |
+| Oversegmentation | Low confidence threshold | Increase confidence to 0.8+ |
+| False positives (large vehicles, structures) | Similar appearance to buildings | Increase confidence and validate with temporal analysis |
+
+## Related Tasks
+
+- [`building-detection`](./building-detection.md) - Detect buildings before extracting footprints
+- [`mask-generation`](./mask-generation.md) - Generate precise building boundaries
+- [`object-detection`](./object-detection.md) - General-purpose object detection including buildings
+- [`land-cover-classification`](./land-cover-classification.md) - Classify built-up vs natural areas
