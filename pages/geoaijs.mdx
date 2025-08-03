@@ -1,43 +1,43 @@
-# GeoAI.js Documentation
+import { Callout } from 'nextra/components';
 
-> Powerful geospatial AI for JavaScript developers - no backend required
+# GeoAI.js
+> Run AI models on satellite imagery directly in your browser
 
-## 🚀 Quick Start
+GeoAI.js brings powerful computer vision to geospatial applications. Detect objects, segment regions, and classify land cover from satellite or aerial imagery - all client-side with zero server setup.
 
-- [**Quickstart Guide**](./quickstart.md) - Get up and running in minutes
+## 🚀 Getting Started
 
-## 📚 Tutorials
+[**Quickstart Guide**](./geoaijs/quickstart) - Get up and running in 5 minutes
 
-- [Basic Object Detection](./tutorials/01-basic-object-detection.md) - Draw → detect → visualize
-- [Web Worker Optimization](./tutorials/03-web-worker-optimization.md) - Performance & threading
-- [Multiple AI Tasks](./tutorials/04-multiple-ai-tasks.md) - Chaining models
-- [Custom Models](./tutorials/05-custom-models.md) - Using your own models
-- [Production Deployment](./tutorials/06-production-deployment.md) - Optimization & deployment
+## �️ Map Providers
 
-## 📖 Guides
+- [**Map Providers Overview**](./geoaijs/map-providers) - Choose your imagery source
+- [Geobase Maps](./geoaijs/map-providers/geobase) - Cloud-optimized GeoTIFF imagery
+- [Mapbox](./geoaijs/map-providers/mapbox) - High-quality satellite imagery
 
-- [Choosing Map Providers](./guides/choosing-map-providers.md) - Geobase vs Mapbox vs others
-- [Performance Optimization](./guides/performance-optimization.md) - Memory, caching, etc.
-- [Error Handling](./guides/error-handling.md) - Common issues & solutions
+## 🤖 Supported AI Tasks
 
-## 📋 API Reference
+**Detection**
+- [Object Detection](./geoaijs/supported-tasks/object-detection) - General objects
+- [Zero-Shot Detection](./geoaijs/supported-tasks/zero-shot-object-detection) - Custom objects
+- [Car Detection](./geoaijs/supported-tasks/car-detection) - Vehicles
+- [Ship Detection](./geoaijs/supported-tasks/ship-detection) - Maritime vessels
+- [Building Detection](./geoaijs/supported-tasks/building-detection) - Buildings
+- [Solar Panel Detection](./geoaijs/supported-tasks/solar-panel-detection) - Solar installations
+- [Oil Tank Detection](./geoaijs/supported-tasks/oil-storage-tank-detection) - Industrial tanks
 
-- [Supported Models](./api-reference/supported-models.md) - Model registry & capabilities
-- [Individual Task Documentation](./supported-tasks/README.md) - Detailed docs for each AI task
+**Segmentation**
+- [Mask Generation](./geoaijs/supported-tasks/mask-generation) - Object masks
+- [Building Footprints](./geoaijs/supported-tasks/building-footprint-segmentation) - Building boundaries
+- [Land Cover](./geoaijs/supported-tasks/land-cover-classification) - Land use classification
+- [Wetlands](./geoaijs/supported-tasks/wetland-segmentation) - Wetland areas
 
-## 🎯 Examples
+For additional information and support:
 
-- [Vanilla JS + Leaflet](./examples/vanilla-js-leaflet/) - Framework-free approach
+- 📦 [NPM Package](https://www.npmjs.com/package/@geobase-js/geoai)
+- 🐛 [Report Issues](https://github.com/decision-labs/geobase-ai.js/issues)
+- 🎉 [Share Your Creation](https://geobase.app/discord) - Built something cool? We'd love to see it!
 
-## 🔗 Quick Links
-
-- [🏠 Main Repository](https://github.com/decision-labs/geobase-ai.js)
-- [📦 NPM Package](https://www.npmjs.com/package/@geobase-js/geoai)
-- [💬 Discussions](https://github.com/decision-labs/geobase-ai.js/discussions)
-
-## 🤝 Contributing
-
-Found an issue or want to improve the docs? We welcome contributions!
-
-- [Report Documentation Issues](https://github.com/decision-labs/geobase-ai.js/issues)
-- [Suggest Improvements](https://github.com/decision-labs/geobase-ai.js/discussions)
+<Callout type="info" emoji="ℹ️">
+  For support, join our [Discord community]().
+</Callout>

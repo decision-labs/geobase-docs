@@ -1,25 +1,23 @@
 import { Callout } from 'nextra/components';
 
 # GeoBase Map Provider
-
 > High-performance COG imagery serving platform for advanced AI analysis
 
-GeoBase provides a high-performance tile server that can serve your Cloud Optimized GeoTIFF (COG) imagery with exceptional speed and reliability, making it ideal for advanced geospatial AI applications.
+## Setup
 
-## Quick Start
-
-<Callout type="default" emoji="🚀">
-  This example shows how to set up GeoBase as your map provider for AI-powered geospatial analysis.
+<Callout type="info" emoji="🔑">
+  Get your project reference and API key from the [GeoBase dashboard](https://docs.geobase.app/blueprints/shareable-maps-nextjs#environment-variables)
 </Callout>
 
 ```typescript
 import { geoai } from '@geobase-js/geoai';
 
+// Configuration
 const geobaseParams = {
   provider: "geobase",
-  projectRef: "your-project-ref",
-  apikey: "your-api-key", 
-  cogImagery: "your-imagery-url"
+  projectRef: process.env.GEOBASE_PROJECT_REF,
+  apikey: process.env.GEOBASE_API_KEY, 
+  cogImagery: "your-cog-imagery-url"
 };
 
 // Initialize pipeline with GeoBase
@@ -35,39 +33,8 @@ const results = await pipeline.inference({
 });
 ```
 
-## Key Features
+### Parameters
 
-### High-Performance COG Serving
-- **Your imagery**: Serves your own Cloud Optimized GeoTIFF (COG) files
-- **Ultra-fast delivery**: Optimized tile server for rapid image access
-- **Scalable infrastructure**: Handles high-volume requests efficiently
-
-### Enterprise-Grade Performance
-- **High availability**: 99.9% uptime SLA
-- **Fast response times**: Optimized for AI workloads
-- **Bulk processing**: Efficient handling of large areas
-
-## Authentication
-
-<Callout type="info" emoji="🔑">
-  You'll need a GeoBase project reference and API key to get started. These can be obtained from your GeoBase dashboard.
-</Callout>
-
-### API Key Setup
-
-**Get your project reference and API key** from the [GeoBase setup guide](https://docs.geobase.app/blueprints/shareable-maps-nextjs#environment-variables)
-
-**Set environment variables**:
-```bash
-export GEOBASE_PROJECT_REF="your-project-ref"
-export GEOBASE_API_KEY="your-api-key"
-```
-
-**Or pass directly** in configuration:
-
-## ProviderParams Structure
-
-### Required Parameters
 ```typescript
 type GeobaseParams = {
   provider: "geobase";
@@ -76,20 +43,7 @@ type GeobaseParams = {
   cogImagery: string;    // URL to your COG imagery
 };
 ```
-## Supported AI Tasks
 
-<Callout type="info" emoji="📊">
-  Task compatibility depends on your COG imagery specifications (resolution, bands, etc.)
+<Callout type="warning" emoji="🌍">
+  Serves your own Cloud Optimized GeoTIFF (COG) imagery. Task compatibility depends on your COG specifications (resolution, bands, etc.)
 </Callout>
-
-### Multispectral Tasks (Requires 4-band COG)
-- **Wetland Segmentation** - Requires RGB + NIR bands in your COG
-
-## Support
-
-### Documentation
-- [API Reference](https://docs.geobase.app/tileserver)
-
-### Contact
-- **Technical Support**: support@geobase.app
-- **Community**: [Discord](https://discord.com/invite/4susZSj4bd)

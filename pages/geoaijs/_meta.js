@@ -1,6 +1,6 @@
 export default {
 	quickstart: "Quick Start",
-	"api-reference": "API Reference",
+	"concepts": "Concepts",
 	"map-providers": "Map Providers",
 	"supported-tasks": "Supported Tasks",
 };

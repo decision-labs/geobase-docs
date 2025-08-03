@@ -8,18 +8,6 @@ import { Callout } from 'nextra/components';
   The `GeoRawImage` class extends the Hugging Face `RawImage` class to provide georeferencing capabilities essential for geospatial AI tasks. It maintains spatial context by storing coordinate reference system (CRS) information and geographic bounds, enabling seamless conversion between pixel and world coordinates.
 </Callout>
 
-## Overview
-
-`GeoRawImage` is the core image data structure in GeoAI.js that bridges the gap between raw image data and geospatial coordinates. Every AI task in the library processes georeferenced imagery and returns `GeoRawImage` instances alongside detection results.
-
-### Key Features
-
-- **Georeferencing**: Maintains geographic bounds and coordinate reference system
-- **Coordinate Conversion**: Bi-directional conversion between pixel and world coordinates
-- **Inheritance**: Extends `RawImage` with all standard image processing capabilities
-- **Memory Efficient**: Uses affine transformation matrices for spatial calculations
-- **Cloning Support**: Preserves georeferencing information when cloned
-
 ## Class Structure
 
 ```typescript
@@ -198,45 +186,3 @@ interface ObjectDetectionResults {
   geoRawImage: GeoRawImage;
 }
 ```
-
-This enables:
-- **Visualization**: Overlay detections on georeferenced imagery
-- **Validation**: Verify detection accuracy against source imagery
-- **Post-processing**: Apply additional image analysis
-- **Export**: Save results with spatial context
-
-<Callout type="info" emoji="🔗">
-  All AI tasks in GeoAI.js maintain spatial context through GeoRawImage, enabling seamless integration between AI results and geospatial workflows.
-</Callout>
-
-## Error Handling
-
-<Callout type="warning" emoji="⚠️">
-  Always validate converted coordinates against image bounds to ensure they fall within the expected geographic extent.
-</Callout>
-
-```typescript
-try {
-  const [lon, lat] = geoImage.pixelToWorld(x, y);
-  
-  // Validate coordinates are within bounds
-  const bounds = geoImage.getBounds();
-  if (lon < bounds.west || lon > bounds.east || 
-      lat < bounds.south || lat > bounds.north) {
-    console.warn('Converted coordinates outside image bounds');
-  }
-} catch (error) {
-  console.error('Coordinate conversion failed:', error);
-}
-```
-
-## Best Practices
-
-<Callout type="info" emoji="💡">
-  Following these best practices will help ensure optimal performance and reliability when working with georeferenced imagery.
-</Callout>
-
-1. **Memory Management**: Clone only when necessary due to memory implications
-2. **Precision**: Understand coordinate precision limitations with pixel-based conversions
-3. **CRS Awareness**: Ensure consistent coordinate reference systems across operations
-4. **Image Bounds**: Verify image bounds match expected geographic extent

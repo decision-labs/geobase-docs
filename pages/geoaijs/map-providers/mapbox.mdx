@@ -1,23 +1,21 @@
 import { Callout } from 'nextra/components';
 
 # Mapbox Map Provider
+> Mapbox offers global satellite imagery and customizable maps for geospatial AI tasks.
 
-> Vector and raster tiles with extensive customization options for geospatial AI applications
+## Setup
 
-Mapbox provides high-quality vector and raster tiles with comprehensive global coverage, making it an excellent choice for AI applications that need detailed geographic context.
-
-## Quick Start
-
-<Callout type="default" emoji="🗺️">
-  This example shows how to set up Mapbox as your map provider for satellite imagery-based AI analysis.
+<Callout type="info" emoji="�">
+  Get your Mapbox access token at [mapbox.com](https://account.mapbox.com/)
 </Callout>
 
 ```typescript
 import { geoai } from '@geobase-js/geoai';
 
+// Configuration
 const mapboxParams = {
   provider: "mapbox",
-  apiKey: "your-mapbox-access-token",
+  apiKey: process.env.MAPBOX_ACCESS_TOKEN,
   style: "mapbox://styles/mapbox/satellite-v9"
 };
 
@@ -34,53 +32,8 @@ const results = await pipeline.inference({
 });
 ```
 
-## Key Features
+### Parameters
 
-### Satellite Imagery
-- **High-resolution satellite imagery**: Global coverage for AI object detection
-- **High resolution**: Sufficient detail for most AI tasks
-- **Regular updates**: Fresh satellite data with consistent quality
-- **Global availability**: Worldwide coverage with reliable access
-
-### AI-Optimized
-- **RGB format**: Compatible with standard AI models
-- **Consistent quality**: Uniform image quality across regions  
-- **Fast delivery**: Optimized tile serving for AI workloads
-- **Reliable access**: High uptime and performance for production use
-
-## Authentication
-
-<Callout type="info" emoji="🔑">
-  You'll need a Mapbox access token to use Mapbox services. Sign up for a free account to get started.
-</Callout>
-
-### Access Token Setup
-
-**Create Mapbox account** at [mapbox.com](https://account.mapbox.com/)
-
-**Generate access token** with appropriate scopes:
-- `styles:tiles` - For raster and vector tiles
-- `styles:read` - For style information
-- `fonts:read` - For text rendering (optional)
-
-**Set environment variable**:
-```bash
-export MAPBOX_ACCESS_TOKEN="pk.your-access-token-here"
-```
-
-**Or pass directly** in configuration:
-```typescript
-const mapboxParams = {
-  provider: "mapbox",
-  apiKey: process.env.MAPBOX_ACCESS_TOKEN,
-  style: "mapbox://styles/mapbox/satellite-v9"
-};
-```
-
-
-## ProviderParams Structure
-
-### Required Parameters
 ```typescript
 type MapboxParams = {
   provider: "mapbox";
@@ -89,43 +42,6 @@ type MapboxParams = {
 };
 ```
 
-## Supported Map Styles
-
 <Callout type="warning" emoji="🛰️">
-  Only satellite styles are supported for AI tasks. Vector-only styles are not compatible with the AI models.
+  Only satellite styles are supported for AI tasks.
 </Callout>
-
-### Satellite Imagery (Primary)
-```typescript
-// High-resolution satellite imagery - recommended for AI tasks
-style: "mapbox://styles/mapbox/satellite-v9"
-```
-
-## Supported AI Tasks
-
-<Callout type="info" emoji="🤖">
-  Mapbox provides RGB satellite imagery only. For multispectral analysis (requiring NIR bands), use GeoBase or other available map providers instead.
-</Callout>
-
-### RGB-Compatible Tasks
-- **Object Detection** - General object detection with satellite imagery
-- **Car Detection** - Car, truck, and vehicle identification
-- **Building Detection** - Building and structure detection
-- **Ship Detection** - Maritime vessel detection
-- **Oriented Object Detection** - Rotated object detection
-- **Solar Panel Detection** - Solar installation detection
-- **Oil Storage Tank Detection** - Industrial tank detection
-- **Building Footprint Segmentation** - Building boundary extraction
-- **Land Cover Classification** - Limited accuracy in low resolution areas
-
-
-
-## Support
-
-### Documentation
-- [Mapbox API Documentation](https://docs.mapbox.com/)
-- [Style Specification](https://docs.mapbox.com/mapbox-gl-js/style-spec/)
-
-### Community
-- [Stack Overflow](https://stackoverflow.com/questions/tagged/mapbox)
-- [GitHub Issues](https://github.com/mapbox/mapbox-gl-js/issues)

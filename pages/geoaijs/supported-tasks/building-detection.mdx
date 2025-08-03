@@ -1,158 +1,48 @@
-# Building Detection
+import { Callout } from 'nextra/components';
 
-> **Task ID:** `building-detection`  
-> **Library:** `@geobase-js/geoai`  
-> **Purpose:** Specialized detection of buildings and structures in satellite and aerial imagery
+# Building Detection
+> Specialized detection of buildings in satellite imagery
 
 ## Quick Start
 
 ```typescript
 import { geoai } from "@geobase-js/geoai";
 
-// Initialize the pipeline
-const buildingDetectionInstance = await geoai.pipeline(
-  [
-    {
-      task: "building-detection",
-    },
-  ],
-  providerParams
-);
+// Initialize pipeline
+const pipeline = await geoai.pipeline([
+  { task: "building-detection" }
+], providerParams);
 
-// Run inference
-const result = await buildingDetectionInstance.inference({
-  inputs: { polygon: myPolygon },
-  mapSourceParams: { zoomLevel: 18 },
+// Run detection
+const result = await pipeline.inference({
+  inputs: { polygon: myPolygon }
 });
 
 console.log(`Found ${result.detections.features.length} buildings`);
 ```
+## Parameters
 
-## Available Models
-
-| Model ID | Description | Best Use Case |
-|----------|-------------|---------------|
-| [geobase/geoai_models/buildingDetection_quantized](https://huggingface.co/geobase/geoai_models) | Quantized model specialized for building detection | Urban planning, infrastructure analysis |
-
-## Capabilities
-
-- ✅ **Comprehensive building detection** - Residential, commercial, and industrial structures
-- ✅ **Multi-scale analysis** - From small houses to large complexes
-- ✅ **High-resolution support** - Optimized for 15-50cm resolution imagery
-- ✅ **Geospatial integration** - Native GeoJSON output with geographic coordinates
-- ✅ **Quantized model** - Optimized for fast inference and reduced memory usage
-
-## Input Parameters
-
-### Required Inputs
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `polygon` | `GeoJSON.Feature<Polygon>` | Area of interest for building detection |
-
-
-<!-- Todo : update the map source guide link -->
-### Map Source Parameters
-Follow this guide for mapSourceParameters 
-
-## Output Format
-
+### Map Source
 ```typescript
-interface ObjectDetectionResults {
-  detections: GeoJSON.FeatureCollection;
-  geoRawImage: GeoRawImage;
+mapSourceParams: {
+  zoomLevel: 20  // 19-22 recommended
 }
 ```
 
+## Output
 
-
-## Detected Classes
-
-| Class | Description | Typical Use Cases |
-|-------|-------------|-------------------|
-| `Building` | All types of structures including residential, commercial, industrial | Urban planning, damage assessment, population estimation, infrastructure mapping |
-
-## Best Practices
-
-### 🎯 **Optimal Use Cases**
-
-- Urban development planning
-- Population density estimation
-- Damage assessment after disasters
-- Infrastructure inventory
-- Real estate analysis
-- Zoning compliance monitoring
-
-### ⚡ **Performance Tips**
+Returns GeoJSON with detected buildings:
 
 ```typescript
-// Optimal zoom levels for different scenarios
-mapSourceParams: { zoomLevel: 18 } // Detailed urban analysis
-mapSourceParams: { zoomLevel: 17 } // Regional building surveys
-mapSourceParams: { zoomLevel: 19 } // High-precision small building detection
-```
-
-### 🏗️ **Building Type Considerations**
-
-- **Residential:** Best detection for houses with clear rooflines
-- **Commercial:** Excellent for large retail and office buildings
-- **Industrial:** Good detection for warehouses and factories
-- **Mixed-use:** May require lower confidence thresholds
-
-
-## Advanced Features
-
-### Building Size Classification
-```typescript
-// Classify buildings by size and type
-const classifyBuildings = (detections: GeoJSON.FeatureCollection) => {
-  return detections.features.map(building => {
-    const bbox = getBoundingBox(building.geometry);
-    const area = calculateAreaFromBbox(bbox);
-    
-    let buildingType;
-    if (area < 100) buildingType = "small_residential";
-    else if (area < 500) buildingType = "medium_residential";
-    else if (area < 2000) buildingType = "large_residential";
-    else if (area < 10000) buildingType = "commercial";
-    else buildingType = "industrial";
-    
-    return {
-      ...building,
-      properties: {
-        ...building.properties,
-        estimatedArea: area,
-        buildingType
+{
+  detections: {
+    type: "FeatureCollection", 
+    features: [
+      {
+        geometry: { /* building polygon */ },
+        properties: {}
       }
-    };
-  });
-};
+    ]
+  }
+}
 ```
-
-### Building Density Analysis
-```typescript
-// Analyze building density across different zones
-const analyzeBuildingDensity = (polygon: GeoJSON.Feature, gridSize: number) => {
-  const grid = createGrid(polygon, gridSize);
-  
-  return Promise.all(
-    grid.features.map(async (cell) => {
-      const result = await buildingDetectionInstance.inference({
-        inputs: { polygon: cell }
-      });
-      
-      return {
-        cell,
-        buildingCount: result.detections.features.length,
-        density: result.detections.features.length / calculateAreaKm2(cell)
-      };
-    })
-  );
-};
-```
-
-## Related Tasks
-
-- [`object-detection`](./object-detection.md) - General-purpose object detection including buildings
-- [`building-footprint-segmentation`](./building-footprint-segmentation.md) - Precise building boundary extraction
-- [`mask-generation`](./mask-generation.md) - Generate precise building boundaries

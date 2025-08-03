@@ -70,7 +70,7 @@ const result = await chainedPipeline.inference({
   Task chaining allows you to connect multiple AI models where the output of one becomes the input of the next, enabling complex analysis workflows.
 </Callout>
 
-## API Reference
+## Pipeline
 
 ### `geoai.pipeline(tasks, providerParams)`
 
@@ -146,19 +146,13 @@ interface InferenceParams {
 }
 ```
 
-#### Returns
-
-Returns `ObjectDetectionResults` or `SegmentationResults` depending on the task(s).
-
 <Callout type="warning" emoji="⚠️">
   Ensure your polygon coordinates are in the correct format (GeoJSON) and that your API keys have proper permissions for the selected tasks.
 </Callout>
 
-## Advanced Features
-
 ### Task Chaining
 
-Task chaining enables sophisticated geospatial analysis by connecting multiple AI models in sequence.
+Task chaining lets you run multiple AI models one after another.
 
 #### Supported Chains
 
@@ -219,17 +213,4 @@ const validChains = geoai.validateChain(["task1", "task2"]);
 
 <Callout type="info" emoji="ℹ️">
   Use the `validateChain()` method to ensure your task combinations are supported before creating pipelines.
-</Callout>
-
-## Next Steps
-
-Ready to implement geospatial AI in your applications? Here are some recommended next steps:
-
-- **Explore Tasks**: Browse [Supported Tasks](../supported-tasks/) for detailed documentation on each AI capability
-- **Optimize Performance**: Check out [Performance Optimization](../guides/performance-optimization.md) for best practices
-- **Learn by Example**: Visit our [Tutorials](../tutorials/) for hands-on, step-by-step implementation guides
-- **Integration Guide**: See [React Integration](../react-integration.md) for frontend framework specifics
-
-<Callout type="info" emoji="ℹ️">
-  For production deployments, review our performance optimization guide to ensure optimal resource usage and response times.
 </Callout>

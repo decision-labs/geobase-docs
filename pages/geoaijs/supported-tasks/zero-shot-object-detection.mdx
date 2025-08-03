@@ -1,166 +1,89 @@
-# Zero-Shot Object Detection
+import { Callout } from 'nextra/components';
 
-> **Task ID:** `zero-shot-object-detection`  
-> **Library:** `@huggingface/transformers`  
-> **Purpose:** Detect custom object classes without specific training
+# Zero-Shot Object Detection
+> Detect custom objects using text prompts
 
 ## Quick Start
 
 ```typescript
 import { geoai } from "@geobase-js/geoai";
 
-// Initialize the pipeline
-const zeroShotInstance = await geoai.pipeline(
-  [
-    {
-      task: "zero-shot-object-detection",
-      modelId: "onnx-community/grounding-dino-tiny-ONNX", // optional
-    },
-  ],
-  providerParams
-);
-
-// Run inference with custom class
-const classLabel = ["wind turbine."]
-const result = await zeroShotInstance.inference({
-  inputs: { 
-    polygon: myPolygon,
-    classLabel: classLabel
-  },
-  mapSourceParams: { zoomLevel: 18 },
-  postProcessingParams: { 
-    threshold: 0.3,
-    topk: 10
-  },
-});
-
-console.log(`Found ${result.detections.features.length} wind turbines`);
-```
-
-## Available Models
-
-| Model ID | Description | Best Use Case |
-|----------|-------------|---------------|
-| [onnx-community/grounding-dino-tiny-ONNX](https://huggingface.co/onnx-community/grounding-dino-tiny-ONNX) | Grounding DINO tiny model | Custom object detection with natural language |
-<!-- Todo : add this model - [Xenova/owlvit-base-patch32](https://huggingface.co/Xenova/owlvit-base-patch32) -->
-
-## Capabilities
-
-- ✅ **Natural language queries** - Describe objects in plain English
-- ✅ **No training required** - Works with any object description
-- ✅ **Multiple classes** - Detect several object types in one inference
-- ✅ **Confidence scoring** - Threshold-based filtering
-- ✅ **Pipeline chaining** - Compatible with mask generation
-
-## Input Parameters
-
-### Required Inputs
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `polygon` | `GeoJSON.Feature<Polygon>` | Area of interest for detection |
-| `classLabel` | `string \| string[]` | Object class(es) to detect |
-
-### Post Processing Parameters
-
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `threshold` | `number` | `0.2` | Minimum confidence threshold (0-1) |
-| `topk` | `number` | `4` | Maximum detections per class |
-
-<!-- Todo : update the map source guide link -->
-### Map Source Parameters
-Follow this guide for mapSourceParameters 
-
-## Output Format
-
-```typescript
-interface ObjectDetectionResults {
-  detections: GeoJSON.FeatureCollection;
-  geoRawImage: GeoRawImage;
-}
-```
-
-### Detection Feature Properties
-
-```typescript
-interface DetectionProperties {
-  score: number;        // Detection confidence (0-1)
-  label: string;        // Detected class label
-}
-```
-
-## Example Class Labels
-
-### Infrastructure
-- "wind turbine", "solar panel", "cell tower"
-- "bridge", "dam"
-- "construction crane", "excavator"
-
-### Vehicles & Transportation
-- "aircraft", "helicopter"
-- "train", "subway car", "tram"
-- "cargo ship", "yacht", "fishing boat"
-
-### Natural Features
-- "swimming pool", "tennis court", "golf course"
-- "forest", "lake", "river"
-- "beach", "cliff", "mountain"
-
-## Best Practices
-
-### 🎯 **Effective Class Descriptions**
-
-```typescript
-// Good - Specific and descriptive
-classLabel: "wind turbine"
-classLabel: "circular swimming pool"
-classLabel: "red barn"
-
-// Avoid - Too generic or ambiguous
-classLabel: "structure"
-classLabel: "thing"
-classLabel: "object"
-```
-
-### ⚡ **Performance Tips**
-
-```typescript
-// Use specific thresholds for your use case
-postProcessingParams: { 
-  threshold: 0.3,  // Lower for rare objects
-  topk: 5          // Limit results for performance
-}
-```
-
-### 🔗 **Pipeline Chaining**
-
-Excellent for generating masks after detection:
-
-```typescript
+// Initialize pipeline
 const pipeline = await geoai.pipeline([
-  { task: "zero-shot-object-detection" },
-  { task: "mask-generation" }
+  { task: "zero-shot-object-detection" }
 ], providerParams);
 
-const results = await pipeline.inference({
+// Run detection with custom classes
+const result = await pipeline.inference({
   inputs: { 
     polygon: myPolygon,
-    classLabel: "solar panel"
+    classLabel: "trees."
+  },
+  postProcessingParams: { 
+    threshold: 0.2,
+    topk: 10
   }
 });
+
+console.log(`Found ${result.detections.features.length} objects`);
 ```
 
-## Common Issues & Solutions
+<Callout type="info" emoji="🎯">
+  Detect any object by describing it in plain English - no training required!
+</Callout>
 
-| Issue | Cause | Solution |
-|-------|-------|----------|
-| No detections found | Threshold too high | Lower `threshold` to 0.1-0.2 |
-| Many false positives | Threshold too low | Increase `threshold` to 0.4-0.6 |
-| Inconsistent results | Vague class description | Use more specific, descriptive labels |
+## Parameters
 
-## Related Tasks
+### Input
+```typescript
+inputs: {
+  polygon: myPolygon,
+  classLabel: "trees."  // Describe objects dot seperated
+}
+```
 
-- [`object-detection`](./object-detection.md) - Pre-trained object classes
-- [`mask-generation`](./mask-generation.md) - Generate precise object masks  
-- [`oriented-object-detection`](./oriented-object-detection.md) - Detect rotated objects
+### Post-Processing
+```typescript
+postProcessingParams: {
+  threshold: 0.2,  // Confidence threshold (0.0-1.0)
+  topk: 10        // Maximum detections per class
+}
+```
+
+## Example Objects
+
+**Infrastructure**
+- `wind turbine`, `solar panel`, `cell tower`
+- `bridge`, `dam`, `construction crane`
+
+**Vehicles**
+- `aircraft`, `helicopter`, `cargo ship`
+- `train`, `yacht`, `fishing boat`
+
+**Facilities**
+- `swimming pool`, `tennis court`, `golf course`
+- `baseball field`, `basketball court`
+
+**Natural Features**
+- `forest`, `lake`, `river`, `beach`
+
+## Output
+
+Returns GeoJSON with detected custom objects:
+
+```typescript
+{
+  detections: {
+    type: "FeatureCollection",
+    features: [
+      {
+        geometry: { /* object location */ },
+        properties: {
+          label: "tree",
+          score: 0.76
+        }
+      }
+    ]
+  }
+}
+```

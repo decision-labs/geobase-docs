@@ -1,83 +1,18 @@
 import { Callout } from 'nextra/components';
 
 # Map Providers
-
-Comprehensive integration guides for different map tile providers with GeoAI.js, covering setup instructions, authentication, tile formats, and optimization strategies.
+> Choose your imagery source for geospatial AI analysis
 
 ## Supported Providers
 
-Current and upcoming map tile provider integrations:
+| Provider | Features | Authentication |
+|----------|----------|----------------|
+| [GeoBase](./map-providers/geobase) | Your COG imagery, multispectral support | API Key |
+| [Mapbox](./map-providers/mapbox) | Global satellite imagery | Access Token |
+| Google Maps | 🚧 Coming Soon - Global satellite imagery | - |
+| Esri ArcGIS | 🚧 Coming Soon - RGB, Multispectral | - |
 
-| Provider | Status | Tile Formats | Authentication | Performance |
-|----------|--------|--------------|---------------|-------------|
-| [GeoBase](./map-providers/geobase.md) | ✅ Complete | RGB, Multispectral | API Key | High |
-| [Mapbox](.//map-providers/mapbox.md) | ✅ Complete | RGB, Satellite | Access Token | High |
-| Google Maps | 🚧 Coming Soon | RGB, Satellite | API Key | High |
-| Esri ArcGIS | 🚧 Coming Soon | RGB, Multispectral | Token | Medium |
-
-<Callout type="info" emoji="ℹ️">
-  New providers are regularly added based on community demand. Check our roadmap or request support for specific providers.
-</Callout>
-
-
-## Provider Comparison
-
-### Image Quality & Resolution
-- **GeoBase**: High resolution, multispectral imagery optimized for AI analysis
-- **Mapbox**: High resolution RGB satellite imagery with global coverage
-
-### Pricing Models
-- **GeoBase**: Flexible pricing options - check [geobase.app/pricing](https://geobase.app/pricing) or consult our team on [Discord](https://discord.com/invite/4susZSj4bd)
-- **Mapbox**: Usage-based pricing - see [mapbox.com/pricing](https://www.mapbox.com/pricing) for current rates
-
-### AI Model Compatibility
-- **GeoBase**: Optimized for all AI tasks, especially multispectral analysis models
-- **Mapbox**: Fully compatible with RGB-based AI detection and analysis models
-
-<Callout type="info" emoji="ℹ️">
-  For detailed tile server setup with GeoBase, refer to the [tile server documentation](https://docs.geobase.app/tileserver).
-</Callout>
-
-## Contributing New Providers
-
-Help expand provider support by contributing new integrations:
-
-1. **Documentation**: Create provider-specific documentation following our established template
-2. **Authentication Guide**: Include comprehensive authentication setup instructions
-3. **Configuration Examples**: Provide practical code examples and tile configurations
-4. **Performance Benchmarks**: Add performance metrics and cost analysis
-5. **Compatibility Testing**: Ensure compatibility with existing AI tasks and workflows
-
-<Callout type="info" emoji="ℹ️">
-  When contributing new providers, ensure all examples are tested and include error handling for common authentication and configuration issues.
-</Callout>
-
-## Support & Troubleshooting
-
-### Getting Help
-
-For provider-specific issues and questions:
-
-- **Documentation**: Check individual provider guides for detailed setup instructions
-- **Authentication**: Verify API keys, tokens, and quota settings in your provider dashboard
-- **Troubleshooting**: Consult troubleshooting sections in each provider's documentation
-- **Community Support**: Join our [Discord community](https://discord.com/invite/4susZSj4bd) for real-time assistance
-
-### Common Issues
-
-- **Authentication Errors**: Double-check API key format and permissions
-- **Rate Limiting**: Monitor usage against provider quotas and implement appropriate caching
-- **Tile Loading**: Verify network connectivity and provider service status
-
-## Next Steps
-
-Ready to integrate map providers with your geospatial AI applications?
-
-- **Quick Start**: Begin with [GeoBase Provider](./geobase.mdx) for the most comprehensive AI-optimized experience
-- **Alternative Options**: Explore [Mapbox Integration](./mapbox.mdx) for RGB satellite imagery
-- **Performance Guide**: Review [Choosing Map Providers](../guides/choosing-map-providers.md) for selection criteria
-- **Implementation Examples**: Check out our [tutorials](../tutorials/) for step-by-step integration examples
-
-<Callout type="info" emoji="ℹ️">
-  Start with a single provider to familiarize yourself with the integration patterns, then expand to multiple providers as your application requirements grow.
+<Callout type="info" emoji="💡">
+  **GeoBase** - Use your own imagery with full control  
+  **Mapbox** - Ready-to-use global satellite coverage
 </Callout>
