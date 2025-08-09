@@ -1,0 +1,32 @@
+---
+title: "@geobase-js/geoai.js"
+---
+
+import { Callout } from 'nextra/components';
+
+# @geobase-js/geoai.js
+
+JavaScript library for AI inference on satellite imagery with React and MapLibre. Use it to add detection and segmentation to maps in minutes.
+
+<Callout type="tip">Start with the hosted quickstart and live demo below.</Callout>
+
+- Quickstart: https://docs.geobase.app/geoai
+- Live Demo: https://docs.geobase.app/geoai-live
+- GitHub: https://github.com/decision-labs/geobase-ai.js
+
+## What it does
+
+- Building/Object detection and segmentation
+- Works with Geobase, Mapbox, Esri providers
+- Simple pipeline API and optional Web Worker support
+
+## Install
+
+```bash
+npm install @geobase-js/geoai maplibre-gl maplibre-gl-draw
+```
+
+## Quick example
+
+See the React example in the Quickstart. Configure your provider, draw a polygon, run `geoai.pipeline([...]).inference(...)` and render detections on the map.
+
