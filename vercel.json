@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/geoai/:path*", "destination": "https://geoaidocs.vercel.app/geoai/:path*" },
+    { "source": "/geoai-live/:path*", "destination": "https://geoai-examples.vercel.app/geoai-live/:path*" }
+  ]
+}
