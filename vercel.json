@@ -1,15 +1,13 @@
 {
   "rewrites": [
-    {
-      "rewrites": [
-        { "source": "/geoai/_next/image", "destination": "https://geoai-docs.vercel.app/geoai/_next/image" },
-        { "source": "/geoai/_next/:path*", "destination": "https://geoai-docs.vercel.app/geoai/_next/:path*" },
-        { "source": "/geoai/:path+", "destination": "https://geoai-docs.vercel.app/geoai/:path+" },
-    
-        { "source": "/geoai-live/_next/image", "destination": "https://geoai-examples.vercel.app/geoai-live/_next/image" },
-        { "source": "/geoai-live/_next/:path*", "destination": "https://geoai-examples.vercel.app/geoai-live/_next/:path*" },
-        { "source": "/geoai-live/:path+", "destination": "https://geoai-examples.vercel.app/geoai-live/:path+" }
-      ]
-    }    
+    { "source": "/geoai/_next/image",     "destination": "https://geoai-docs.vercel.app/geoai/_next/image" },
+    { "source": "/geoai/_next/:path*",    "destination": "https://geoai-docs.vercel.app/geoai/_next/:path*" },
+    { "source": "/geoai/:path+",          "destination": "https://geoai-docs.vercel.app/geoai/:path+" },
+    { "source": "/geoai",                 "destination": "https://geoai-docs.vercel.app/geoai" },
+
+    { "source": "/geoai-live/_next/image","destination": "https://geoai-examples.vercel.app/geoai-live/_next/image" },
+    { "source": "/geoai-live/_next/:path*","destination": "https://geoai-examples.vercel.app/geoai-live/_next/:path*" },
+    { "source": "/geoai-live/:path+",     "destination": "https://geoai-examples.vercel.app/geoai-live/:path+" },
+    { "source": "/geoai-live",            "destination": "https://geoai-examples.vercel.app/geoai-live" }
   ]
 }
