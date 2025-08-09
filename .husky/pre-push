@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+
+# Scan notebooks on push to avoid slow pre-commit
+git diff --name-only --cached | grep -E "\.ipynb$" | xargs -r npx -y secretlint --maskSecrets || exit 1
+
+
