@@ -26,7 +26,7 @@ const config = {
 			/>
 	),
 	project: {
-		link: "https://github.com/decision-labs/geobase",
+		link: "https://github.com/decision-labs/geobase-docs",
 	},
 	chat: {
 		link: "https://geobase.app/discord",
