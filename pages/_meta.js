@@ -23,7 +23,7 @@ export default {
 		type: "separator",
 	},
 	"geoai-js": {
-		title: "@geobase-js/geoai.js",
+		title: "🌟 GeoAI.js",
 	},
 	signup: {
 		title: "Sign Up ↗",

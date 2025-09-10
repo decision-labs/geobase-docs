@@ -1,5 +1,12 @@
 export default {
-	"shareable-maps-nextjs": "Shareable Maps App (Next.js)",
+	"shareable-maps-nextjs": {
+		title: "Shareable Maps",
+		icon: "lucide:nextjs"
+	},
+	"ship-movement": {
+		title: "Ships Movement", 
+		icon: "lucide:react"
+	},
 	// "shareable-maps-flutter": "Shareable Maps App (Flutter)",
 	// "movement-analysis-traces": "Movement Traces (React SPA)"
 }
