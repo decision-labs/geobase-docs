@@ -1,0 +1,87 @@
+# Blueprint: Taxi Analysis (React.js)
+
+A Geobase quickstart blueprint application for analyzing taxi movement patterns and closest pass interactions.
+
+## Video Tutorial
+
+Watch the complete tutorial on building this blueprint:
+
+[![Geobase Taxi Analysis Blueprint Tutorial](https://img.youtube.com/vi/g8VRyB0V2Z0/0.jpg)](https://www.youtube.com/watch?v=g8VRyB0V2Z0)
+
+[🎥 View the blueprint tutorial on YouTube](https://www.youtube.com/watch?v=g8VRyB0V2Z0)
+
+## Repository
+
+Access the complete source code and detailed setup instructions:
+
+**[GitHub Repository →](https://github.com/decision-labs/geobase-blueprint-taxi-analysis)**
+
+---
+
+## What's Included
+
+This React and Geobase application features:
+
+- **Animated taxi trajectories** with temporal playback controls
+- **MobilityDB integration** for efficient temporal-spatial analysis
+- **Closest pass detection** identifying when taxis come within 10 meters
+- **Hexagonal grid analysis** for regional trip statistics
+- **Interactive timeline** for temporal data exploration
+
+## Key Features
+
+### Movement Analysis
+- **Temporal trajectories**: Track taxi movements over time with MobilityDB
+- **Speed calculations**: Analyze average speeds and trip durations
+- **Route optimization**: Identify common paths and traffic patterns
+- **Data cleaning**: Automatic filtering and simplification of GPS tracks
+
+### Proximity Detection
+- **Closest pass analysis**: Find when taxis pass within 10 meters of each other
+- **Temporal correlation**: Identify exact timestamps of close encounters
+- **Visual indicators**: Animated points showing proximity events
+- **Safety insights**: Analyze potential near-miss situations
+
+### Spatial Analytics
+- **H3 hexagonal grids**: Aggregate trip data into hexagonal regions
+- **Regional statistics**: Calculate trip counts, durations, and speeds per area
+- **Temporal filtering**: Analyze patterns across different time periods
+- **Performance optimization**: Efficient spatial indexing and queries
+
+## Technology Stack
+
+- **Backend**: PostgreSQL with PostGIS and MobilityDB extensions
+- **Frontend**: React.js with TypeScript
+- **Mapping**: MapLibre GL JS and Deck.gl
+- **Spatial Analysis**: H3 hexagonal indexing
+- **Data Processing**: Temporal geometry operations
+
+## Database Functions
+
+### Core Analytics
+- **Trajectory processing**: Convert GPS points to temporal sequences
+- **Speed analysis**: Calculate time-weighted average speeds
+- **Duration metrics**: Measure trip times within specific areas
+- **Spatial clipping**: Extract trajectories within polygon boundaries
+
+### Proximity Analysis
+- **Distance calculations**: Find minimum distances between trajectories
+- **Temporal intersection**: Identify when trips overlap in time and space
+- **Point extraction**: Get exact locations of closest approaches
+- **Performance optimization**: Bounding box and temporal filtering
+
+## Visualization Features
+
+- **Animated playback**: Watch taxi movements unfold over time
+- **Layered display**: Toggle between trajectories and proximity events
+- **Interactive controls**: Scrub through time with timeline controls
+- **Color coding**: Different visualizations for various data types
+- **Fade effects**: Smooth animations for temporal events
+
+## Use Cases
+
+- **Urban planning**: Understand traffic flow patterns
+- **Fleet optimization**: Analyze route efficiency
+- **Safety analysis**: Identify high-risk areas for close encounters
+- **Demand prediction**: Forecast taxi needs by location and time
+- **Infrastructure planning**: Optimize road and pickup point locations
