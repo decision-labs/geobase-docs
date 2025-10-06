@@ -17,6 +17,7 @@ export default {
 	guides: "Guides",
 	extensions: "Extensions",
 	tileserver: "Tile Server",
+	"routing-engine": "Routing Engine",
 	supabase: "Supabase Docs",
 	libraries: {
 		title: "Libraries",

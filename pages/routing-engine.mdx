@@ -1,0 +1,98 @@
+# Routing Engine
+
+The Geobase Routing Engine provides a powerful turn-by-turn routing API to calculate routes for various modes of transportation.
+
+## API Endpoint
+
+The Routing Engine exposes a single `POST` endpoint for calculating routes:
+
+```
+https://services.geobase.app/routing-engine/v1/route
+```
+
+You must provide an API key with each request. It can be either as the query parameter `apikey` or the header `apikey`. This is your Geobase Organization Services API key, under the "Services" tab in your organization.
+
+## Request Body
+
+To calculate a route, you send a JSON object in the request body with the following parameters:
+
+### `RouteRequest` Schema
+
+| Parameter         | Type      | Description                                                                                             | Required |
+| ----------------- | --------- | ------------------------------------------------------------------------------------------------------- | -------- |
+| `locations`       | `array`   | An array of two or more `Location` objects to visit in order.                                           | Yes      |
+| `costing`         | `string`  | The costing model to use: `auto`, `bicycle`, `pedestrian`, `truck`, `bus`, `motor_scooter`, `motorcycle`, `taxi`. | Yes      |
+| `costing_options` | `object`  | Optional parameters for the chosen costing model.                                                       | No       |
+| `units`           | `string`  | Distance units for output: `kilometers` or `miles`.                                          | No       |
+| `language`        | `string`  | The language for narration instructions (e.g., `en-US`).                                                | No       |
+| `directions_type` | `string`  | Level of detail for directions: `none`, `maneuvers`, or `instructions`.                                 | No       |
+| `id`              | `string`  | An identifier to name the route request.                                                                | No       |
+
+### `Location` Object
+
+| Parameter | Type     | Description                                                              | Required |
+| --------- | -------- | ------------------------------------------------------------------------ | -------- |
+| `lat`       | `number` | Latitude of the location in degrees.                                     | Yes      |
+| `lon`       | `number` | Longitude of the location in degrees.                                    | Yes      |
+| `type`      | `string` | Type of location: `break`, `through`, `via`, or `break_through`.         | No       |
+| `street`    | `string` | Street name to assist in finding the correct routing location.           | No       |
+
+### Example Request
+
+Here is an example of how to request a route for a car between two points:
+
+```bash
+curl -X POST 'https://services.geobase.app/routing-engine/v1/route?apikey=YOUR_API_KEY' \
+-H 'Content-Type: application/json' \
+-d '{
+  "locations": [
+    { "lat": 50.7487, "lon": 7.1374 },
+    { "lat": 50.7406, "lon": 7.0995 }
+  ],
+  "costing": "auto",
+  "units": "kilometers"
+}'
+```
+
+## Response Structure
+
+The API returns a `RouteResponse` object containing the calculated trip details.
+
+### `RouteResponse` Schema
+
+| Parameter | Type   | Description                               | 
+| --------- | ------ | ----------------------------------------- |
+| `trip`    | `Trip` | Contains the full details of the route. |
+
+### `Trip` Object
+
+A trip contains one or more legs. For n number of break locations, there are n-1 legs. Through locations do not create separate legs.
+
+Each leg of the trip includes a summary, which is comprised of the same information as a trip summary but applied to the single leg of the trip. It also includes a `shape`, which is an encoded polyline of the route path (with 6 digits decimal precision), and a list of maneuvers as a JSON array. For more about decoding route shapes, see these code examples.
+
+| Parameter | Type      | Description                                                              |
+| --------- | --------- | ------------------------------------------------------------------------ |
+| `legs`    | `array`   | An array of `Leg` objects, one for each segment between `break` locations. |
+| `summary` | `Summary` | A summary of the entire trip (total time, distance, etc.).               |
+| `status`  | `integer` | Status code for the request.                                             |
+
+### `Leg` Object
+
+Each `Leg` represents a portion of the trip and contains:
+
+| Parameter   | Type      | Description                                                              |
+| ----------- | --------- | ------------------------------------------------------------------------ |
+| `maneuvers` | `array`   | An array of `Maneuver` objects with turn-by-turn instructions.           |
+| `shape`     | `string`  | An encoded polyline (6-digit precision) representing the route geometry. |
+| `summary`   | `Summary` | A summary of this specific leg.                                          |
+
+### `Maneuver` Object
+
+The `Maneuver` object provides detailed instructions for each step of the route.
+
+| Parameter     | Type     | Description                                  |
+| ------------- | -------- | -------------------------------------------- |
+| `instruction` | `string` | Written maneuver instruction.                |
+| `time`        | `number` | Estimated time for the maneuver in seconds.  |
+| `length`      | `number` | Length of the maneuver in the specified units. |
+| `travel_mode` | `string` | The mode of travel (e.g., `drive`, `walk`).  |
