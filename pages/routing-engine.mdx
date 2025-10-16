@@ -22,11 +22,10 @@ To calculate a route, you send a JSON object in the request body with the follow
 | ----------------- | --------- | ------------------------------------------------------------------------------------------------------- | -------- |
 | `locations`       | `array`   | An array of two or more `Location` objects to visit in order.                                           | Yes      |
 | `costing`         | `string`  | The costing model to use: `auto`, `bicycle`, `pedestrian`, `truck`, `bus`, `motor_scooter`, `motorcycle`, `taxi`. | Yes      |
-| `costing_options` | `object`  | Optional parameters for the chosen costing model.                                                       | No       |
-| `units`           | `string`  | Distance units for output: `kilometers` or `miles`.                                          | No       |
+| `units`           | `string`  | Distance units for output: `kilometers` or `miles`. Default: `kilometers`                    | No       |
 | `language`        | `string`  | The language for narration instructions (e.g., `en-US`).                                                | No       |
-| `directions_type` | `string`  | Level of detail for directions: `none`, `maneuvers`, or `instructions`.                                 | No       |
-| `id`              | `string`  | An identifier to name the route request.                                                                | No       |
+| `directions_type` | `string`  | Level of detail for directions: `none`, `maneuvers`, or `instructions`. Default: `instructions`         | No       |
+| `id`              | `string`  | An identifier to name the route request. Will be returned as-is                                         | No       |
 
 ### `Location` Object
 
@@ -60,7 +59,7 @@ The API returns a `RouteResponse` object containing the calculated trip details.
 
 ### `RouteResponse` Schema
 
-| Parameter | Type   | Description                               | 
+| Parameter | Type   | Description                               |
 | --------- | ------ | ----------------------------------------- |
 | `trip`    | `Trip` | Contains the full details of the route. |
 
