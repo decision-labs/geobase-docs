@@ -29,12 +29,27 @@ To calculate a route, you send a JSON object in the request body with the follow
 
 ### `Location` Object
 
-| Parameter | Type     | Description                                                              | Required |
-| --------- | -------- | ------------------------------------------------------------------------ | -------- |
-| `lat`       | `number` | Latitude of the location in degrees.                                     | Yes      |
-| `lon`       | `number` | Longitude of the location in degrees.                                    | Yes      |
-| `type`      | `string` | Type of location: `break`, `through`, `via`, or `break_through`.         | No       |
-| `street`    | `string` | Street name to assist in finding the correct routing location.           | No       |
+| Parameter | Type     | Description                                                                | Required |
+| --------- | -------- | -------------------------------------------------------------------------- | -------- |
+| `lat`     | `number` | Latitude of the location in degrees.                                       | Yes      |
+| `lon`     | `number` | Longitude of the location in degrees.                                      | Yes      |
+| `type`    | `string` | Type of location: `break` (default), `through`, `via`, or `break_through`. Details in next section  | No       |
+| `street`  | `string` | Street name to assist in finding the correct routing location.             | No       |
+
+#### Location types
+
+Each location type controls two characteristics: whether or not to allow a
+u-turn at the location and whether or not to generate guidance (legs at the
+location, and arrival/departure maneuvers). The default is `break`, and the
+types of the first and last locations are ignored and are treated as breaks.
+
+| Location Type   | Description                                                                |
+| --------------- | -------------------------------------------------------------------------- |
+| `break`         | u-turns allowed, guidance generated.                                       |
+| `through`       | no u-turns, no guidance, just pass through.                                |
+| `via`           | u-turns allowed, no guidance.                                              |
+| `break_through` | no u-turns, but generate guidance.                                         |
+
 
 ### Example Request
 
