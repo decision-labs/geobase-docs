@@ -12,6 +12,7 @@ export default {
 		href: "https://docs.geobase.app/geoai-live",
 		newWindow: true,
 	},
+	ai: "AI",
 	"importing-data": "Importing Data",
 	blueprints: "Blueprints",
 	guides: "Guides",

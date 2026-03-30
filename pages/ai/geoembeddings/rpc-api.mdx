@@ -1,0 +1,19 @@
+import { Callout } from 'nextra/components'
+
+# GeoEmbeddings RPC API (placeholder)
+
+<Callout type="warning" emoji="⏳">
+  This page is a temporary placeholder. The full RPC API docs are coming soon.
+</Callout>
+
+Studio links to this page from the GeoEmbeddings UI (“More details (GeoEmbeddings RPC API)”).
+
+## Minimal usage pattern
+
+```ts
+const { data, error } = await geobase.rpc('similarity_search', {
+  table_name: 'your_embeddings_table',
+  patch_id: 1,
+})
+```
+
