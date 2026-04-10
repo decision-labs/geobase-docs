@@ -1,0 +1,34 @@
+# Automated SRAI embeddings (worker API)
+
+Geobase can run the same **OSM → H3 → join → CountEmbedder** pipeline described in [SRAI basics (Part 1)](./srai_basics_001) as a **background job** on the project worker, then insert vectors into `geoembeddings` via the same catalogue path as raster embeddings.
+
+## When to use this
+
+- You want **hosted** runs (no local Python notebook) with **job status** in Studio.
+- You accept **live Overpass / OSM** fetches (keep AOIs small; respect provider rate limits).
+
+## Worker task
+
+- **Task name:** `createSraiEmbeddings`
+- **HTTP (OpenAPI):** `POST /jobs/createSraiEmbeddings` on the project worker (same host pattern as `createGeoEmbeddings`).
+- **MVP embedder:** `embedderProfile: "count"` (CountEmbedder + `OSMOnlineLoader`), model catalogue name `srai-count-osm-v1`.
+
+### Request body (conceptual)
+
+| Field | Required | Notes |
+| --- | --- | --- |
+| `tableName` | yes | Valid PostgreSQL identifier; destination table in `geoembeddings`. |
+| `h3Resolution` | yes | Integer 0–15 (see H3 docs; tutorials often use 9–11). |
+| `placeQuery` *or* `aoiGeoJson` | one required | Place string is geocoded via srai; or supply GeoJSON Polygon / Feature / FeatureCollection in WGS84. |
+| `osmTags` | no | Tag filter, e.g. `{ "amenity": "bicycle_parking" }`. |
+| `osmPreset` | no | `bicycle_parking` maps to the tutorial default. |
+| `uploadArtifactsToStorage` | no | Same behaviour as raster jobs: optional GeoParquet upload after insert. |
+
+## Studio
+
+In **Create GeoEmbeddings**, choose **OSM (SRAI)** to submit the same job through the Studio API proxy (authenticated with the project service role).
+
+## Related
+
+- Manual notebooks: [Part 1](./srai_basics_001), [Part 2](./srai_basics_002) (Hex2Vec is not automated in this MVP).
+- Worker implementation: `apps/worker/tasks/sraiEmbeddings.ts`, `apps/worker/bin/create_srai_embeddings.py`.
