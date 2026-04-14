@@ -1,0 +1,18 @@
+export default {
+	"geobase-context": "Geobase Context",
+	"project-services": "Project Services",
+	"auth-gotrue": "Auth (GoTrue)",
+	postgrest: "REST (PostgREST)",
+	"storage-api": "Storage API",
+	"analytics-api": "Analytics API",
+	"realtime-websocket": "Realtime (WebSocket)",
+	graphql: "GraphQL",
+	"edge-functions": "Edge Functions",
+	tileserver: "Tileserver",
+	titiler: "Titiler",
+	"postgres-meta": "Postgres Meta",
+	"worker-api": "Worker API",
+	"worker-jobs": "Worker Jobs",
+	"routing-engine": "Routing Engine",
+	"full-stack-examples": "Full Stack Examples",
+};

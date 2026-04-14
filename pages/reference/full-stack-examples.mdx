@@ -1,0 +1,24 @@
+# Full stack examples
+
+This page collects starter repositories for end-to-end Geobase applications (frontend + backend + data setup).
+
+Use with:
+
+- [Geobase context for app-building agents](/reference/geobase-context)
+- [Project & organization services](/reference/project-services)
+
+## Available example repositories
+
+| Example | Framework | Repository | Notes |
+|---|---|---|---|
+| Shareable maps | Next.js | [geobase-blueprint-shareable-maps-nextjs](https://github.com/decision-labs/geobase-blueprint-shareable-maps-nextjs) | Collaborative maps app with auth, DB migrations, and map features. |
+| Ship movement analysis | React | [geobase-blueprint-ship-movement](https://github.com/decision-labs/geobase-blueprint-ship-movement) | Temporal ship-trail analytics and map visualization patterns. |
+| Taxi analysis | React | [geobase-blueprint-taxi-analysis](https://github.com/decision-labs/geobase-blueprint-taxi-analysis) | MobilityDB-based trajectory and closest-pass analysis patterns. |
+
+## Agent workflow
+
+1. Pick one repository that matches your target framework.
+2. Run `geobase projects env <ref> --persona web` to get project env values.
+3. Run `geobase projects endpoints <ref>` to verify service paths.
+4. Apply env + endpoint config to the chosen repo and run locally.
+5. Human checkpoint: validate auth flow, one data read/write operation, and one map/data visualization flow.

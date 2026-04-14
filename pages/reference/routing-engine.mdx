@@ -1,0 +1,39 @@
+# Routing engine
+
+Use this page with [Global Geobase context](/reference/geobase-context).
+
+## What this service is
+
+Routing engine is an organization-wide HTTP service for route calculations.
+
+## When an agent should use it in a Next.js app
+
+Use when your app needs route paths, durations, and distance estimates between coordinates.
+
+## Base URL from CLI output
+
+`{services_origin}/routing-engine/v1/route`
+
+Default `services_origin`: `https://services.geobase.app`.
+
+## Auth required
+
+Organization Services API key. Do not use project anon key for this endpoint.
+
+## Minimal request example
+
+```bash
+curl "${GEOBASE_SERVICES_API_BASE_URL:-https://services.geobase.app}/routing-engine/v1/route?apikey=${GEOBASE_SERVICES_API_KEY}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "coordinates":[[-122.42,37.78],[-122.45,37.91]]
+  }'
+```
+
+## Human checkpoint
+
+Validate API key scope and verify returned route geometry format matches your map renderer.
+
+## Links
+
+- [Project services hub](/reference/project-services#routing-engine-org-services)

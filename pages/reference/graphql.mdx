@@ -1,0 +1,37 @@
+# GraphQL
+
+Use this page with [Global Geobase context](/reference/geobase-context).
+
+## What this service is
+
+GraphQL provides a typed query/mutation interface over project data.
+
+## When an agent should use it in a Next.js app
+
+Use for read-heavy pages where a single query can hydrate multiple UI blocks.
+
+## Base URL from CLI output
+
+`{origin}/graphql/v1`
+
+## Auth required
+
+Typically anon key for policy-constrained reads; server-side token for privileged operations.
+
+## Minimal request example
+
+```bash
+curl "${GEOBASE_PROJECT_URL}/graphql/v1" \
+  -H "apikey: ${GEOBASE_ANON_KEY}" \
+  -H "Authorization: Bearer ${GEOBASE_ANON_KEY}" \
+  -H "Content-Type: application/json" \
+  -d '{"query":"query { __typename }"}'
+```
+
+## Human checkpoint
+
+Confirm schema exposure and field-level access align with app needs.
+
+## Links
+
+- [Project services hub](/reference/project-services#graphql)

@@ -1,0 +1,37 @@
+# Edge Functions
+
+Use this page with [Global Geobase context](/reference/geobase-context).
+
+## What this service is
+
+Edge Functions are custom HTTP handlers deployed with your project.
+
+## When an agent should use it in a Next.js app
+
+Use when app-specific server logic should live near project runtime APIs.
+
+## Base URL from CLI output
+
+`{origin}/functions/v1`
+
+## Auth required
+
+Depends on function policy; do not expose privileged keys in browser code.
+
+## Minimal request example
+
+```bash
+curl -X POST "${GEOBASE_PROJECT_URL}/functions/v1/my-function" \
+  -H "apikey: ${GEOBASE_ANON_KEY}" \
+  -H "Authorization: Bearer ${GEOBASE_ANON_KEY}" \
+  -H "Content-Type: application/json" \
+  -d '{"ping":true}'
+```
+
+## Human checkpoint
+
+Verify function auth mode and timeout behavior for expected payload size.
+
+## Links
+
+- [Project services hub](/reference/project-services#edge-functions)

@@ -1,0 +1,134 @@
+# Project & organization services (API)
+
+This page is the docs hub behind `geobase projects endpoints <ref>`.
+
+- Start with [Global Geobase context](/reference/geobase-context) before using service pages.
+- Use this table to map each CLI endpoint row to the service page an agent should read next.
+
+`{origin}` is the project API origin (for example `https://<ref>.geobase.app`). `{services_origin}` is the org services host (default `https://services.geobase.app`; override with `GEOBASE_SERVICES_API_BASE_URL`).
+
+For JavaScript client setup patterns (browser vs server), see [Geobase context](/reference/geobase-context#javascript-clients-nextjs).
+
+## Per-project (data-plane)
+
+Row `id`s intentionally match CLI deep links from `geobase projects endpoints`.
+
+<table>
+  <thead>
+    <tr>
+      <th>Service</th>
+      <th>Typical path</th>
+      <th>Documentation</th>
+      <th>Client notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr id="rest-postgrest">
+      <td><span id="rest-postgrest"></span>REST (PostgREST)</td>
+      <td><code>{'{'}origin{'}'}/rest/v1/</code></td>
+      <td><a href="/reference/postgrest">PostgREST</a></td>
+      <td>Primary data reads/writes from Next.js server routes.</td>
+    </tr>
+    <tr id="auth-gotrue">
+      <td><span id="auth-gotrue"></span>Auth (GoTrue)</td>
+      <td><code>{'{'}origin{'}'}/auth/v1</code></td>
+      <td><a href="/reference/auth-gotrue">Auth (GoTrue)</a></td>
+      <td>User sign-in and session flows for web apps.</td>
+    </tr>
+    <tr id="storage-api">
+      <td><span id="storage-api"></span>Storage API</td>
+      <td><code>{'{'}origin{'}'}/storage/v1</code></td>
+      <td><a href="/reference/storage-api">Storage API</a></td>
+      <td>File upload/download with bucket policies.</td>
+    </tr>
+    <tr id="edge-functions">
+      <td><span id="edge-functions"></span>Edge Functions</td>
+      <td><code>{'{'}origin{'}'}/functions/v1</code></td>
+      <td><a href="/reference/edge-functions">Edge Functions</a></td>
+      <td>Custom backend actions for app workflows.</td>
+    </tr>
+    <tr id="analytics-api">
+      <td><span id="analytics-api"></span>Analytics API</td>
+      <td><code>{'{'}origin{'}'}/analytics/v1/api</code></td>
+      <td><a href="/reference/analytics-api">Analytics API</a></td>
+      <td>Project metrics and aggregate reporting endpoints.</td>
+    </tr>
+    <tr id="realtime-websocket">
+      <td><span id="realtime-websocket"></span>Realtime (WebSocket)</td>
+      <td><code>wss://{'{'}host{'}'}/realtime/v1/websocket</code></td>
+      <td><a href="/reference/realtime-websocket">Realtime (WebSocket)</a></td>
+      <td>Live subscriptions for reactive UI updates.</td>
+    </tr>
+    <tr id="graphql">
+      <td><span id="graphql"></span>GraphQL</td>
+      <td><code>{'{'}origin{'}'}/graphql/v1</code></td>
+      <td><a href="/reference/graphql">GraphQL</a></td>
+      <td>Alternative query surface for read-heavy views.</td>
+    </tr>
+    <tr id="tileserver-vector-tiles">
+      <td><span id="tileserver-vector-tiles"></span>Tileserver (vector tiles)</td>
+      <td><code>{'{'}origin{'}'}/tileserver/v1</code></td>
+      <td><a href="/reference/tileserver">Tileserver (vector)</a></td>
+      <td>Vector tile map source endpoints for web maps.</td>
+    </tr>
+    <tr id="titiler-raster-cog">
+      <td><span id="titiler-raster-cog"></span>Titiler (raster COG)</td>
+      <td><code>{'{'}origin{'}'}/titiler/v1</code></td>
+      <td><a href="/reference/titiler">Titiler (raster)</a></td>
+      <td>Raster COG tile and metadata endpoints.</td>
+    </tr>
+    <tr id="worker-api-openapi">
+      <td><span id="worker-api-openapi"></span>Worker API (OpenAPI)</td>
+      <td><code>{'{'}origin{'}'}/worker/doc</code></td>
+      <td><a href="/reference/worker-api">Worker API</a></td>
+      <td>Background job API surface for async tasks.</td>
+    </tr>
+    <tr id="worker-osm-import">
+      <td><span id="worker-osm-import"></span>Worker: OSM import</td>
+      <td><code>{'{'}origin{'}'}/worker/jobs/osmImportArea</code></td>
+      <td><a href="/reference/worker-jobs">Worker jobs</a></td>
+      <td>Specialized async import task endpoint.</td>
+    </tr>
+    <tr id="worker-geoembeddings">
+      <td><span id="worker-geoembeddings"></span>Worker: GeoEmbeddings</td>
+      <td><code>{'{'}origin{'}'}/worker/jobs/createGeoEmbeddings</code></td>
+      <td><a href="/reference/worker-jobs">Worker jobs</a></td>
+      <td>Background embedding generation pipeline.</td>
+    </tr>
+    <tr id="worker-srai-embeddings">
+      <td><span id="worker-srai-embeddings"></span>Worker: SRAI embeddings</td>
+      <td><code>{'{'}origin{'}'}/worker/jobs/createSraiEmbeddings</code></td>
+      <td><a href="/reference/worker-jobs">Worker jobs</a></td>
+      <td>Async SRAI embedding job endpoint.</td>
+    </tr>
+    <tr id="postgres-meta-pg">
+      <td><span id="postgres-meta-pg"></span>Postgres meta (pg)</td>
+      <td>from project settings (<code>pgMetaUrl</code>, …)</td>
+      <td><a href="/reference/postgres-meta">Postgres meta</a></td>
+      <td>Privileged metadata APIs for internal tooling.</td>
+    </tr>
+  </tbody>
+</table>
+
+## Organization services (shared)
+
+Same host for all orgs in a Geobase deployment. Use an organization Services API key (not project anon key).
+
+<table>
+  <thead>
+    <tr>
+      <th>Service</th>
+      <th>Typical path</th>
+      <th>Documentation</th>
+      <th>Client notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr id="routing-engine-org-services">
+      <td><span id="routing-engine-org-services"></span>Routing Engine (organization services API)</td>
+      <td><code>{'{'}services_origin{'}'}/routing-engine/v1/route</code> (POST)</td>
+      <td><a href="/reference/routing-engine">Routing engine</a></td>
+      <td>Call from server-side code with org Services API key.</td>
+    </tr>
+  </tbody>
+</table>

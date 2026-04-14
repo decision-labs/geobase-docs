@@ -1,0 +1,35 @@
+# Tileserver (vector tiles)
+
+Use this page with [Global Geobase context](/reference/geobase-context).
+
+## What this service is
+
+Tileserver exposes vector tile endpoints for spatial tables and tile-producing SQL functions.
+
+## When an agent should use it in a Next.js app
+
+Use for interactive map rendering with vector tiles in MapLibre/Mapbox/OpenLayers clients.
+
+## Base URL from CLI output
+
+`{origin}/tileserver/v1`
+
+## Auth required
+
+Anon key for public/policy-allowed tiles; authenticated user/session headers for protected datasets.
+
+## Minimal request example
+
+```bash
+curl "${GEOBASE_PROJECT_URL}/tileserver/v1/public.my_table/0/0/0.pbf?apikey=${GEOBASE_ANON_KEY}" \
+  --output tile.pbf
+```
+
+## Human checkpoint
+
+Confirm source-layer naming and map styling assumptions against real tile payloads.
+
+## Links
+
+- [Project services hub](/reference/project-services#tileserver-vector-tiles)
+- [Tile Server (detailed guide)](/tileserver)

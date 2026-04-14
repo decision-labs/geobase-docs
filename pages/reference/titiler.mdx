@@ -1,0 +1,34 @@
+# Titiler (raster COG)
+
+Use this page with [Global Geobase context](/reference/geobase-context).
+
+## What this service is
+
+Titiler serves Cloud-Optimized GeoTIFF (COG) raster tiles and related metadata endpoints.
+
+## When an agent should use it in a Next.js app
+
+Use for raster overlays, satellite layers, and elevation/imagery visualization.
+
+## Base URL from CLI output
+
+`{origin}/titiler/v1`
+
+## Auth required
+
+Use project keys according to your raster data access policy; prefer server-side token handling for private assets.
+
+## Minimal request example
+
+```bash
+curl "${GEOBASE_PROJECT_URL}/titiler/v1/cog/info?url=${COG_URL}" \
+  -H "apikey: ${GEOBASE_ANON_KEY}"
+```
+
+## Human checkpoint
+
+Validate COG URL reachability and tile rendering parameters (resampling, bands, colormap).
+
+## Links
+
+- [Project services hub](/reference/project-services#titiler-raster-cog)

@@ -1,0 +1,34 @@
+# Analytics API
+
+Use this page with [Global Geobase context](/reference/geobase-context).
+
+## What this service is
+
+Analytics API provides project analytics/query endpoints exposed by your project host.
+
+## When an agent should use it in a Next.js app
+
+Use for dashboard-style metrics, aggregated usage data, and operational summaries.
+
+## Base URL from CLI output
+
+`{origin}/analytics/v1/api`
+
+## Auth required
+
+Use project keys appropriate to the endpoint policy; prefer server-side calls for sensitive metrics.
+
+## Minimal request example
+
+```bash
+curl "${GEOBASE_PROJECT_URL}/analytics/v1/api/health" \
+  -H "apikey: ${GEOBASE_ANON_KEY}"
+```
+
+## Human checkpoint
+
+Verify exact route names exposed in your deployment before wiring frontend calls.
+
+## Links
+
+- [Project services hub](/reference/project-services#analytics-api)

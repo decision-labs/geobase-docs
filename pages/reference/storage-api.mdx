@@ -1,0 +1,37 @@
+# Storage API
+
+Use this page with [Global Geobase context](/reference/geobase-context).
+
+## What this service is
+
+Storage API provides object storage for uploads/downloads through project buckets.
+
+## When an agent should use it in a Next.js app
+
+Use for user uploads, media assets, and generated files.
+
+## Base URL from CLI output
+
+`{origin}/storage/v1`
+
+## Auth required
+
+Anon key for public/client flows with policy constraints; service role for admin operations.
+
+## Minimal request example
+
+```bash
+curl -X POST "${GEOBASE_PROJECT_URL}/storage/v1/object/my-bucket/hello.txt" \
+  -H "apikey: ${GEOBASE_ANON_KEY}" \
+  -H "Authorization: Bearer ${GEOBASE_ANON_KEY}" \
+  -H "Content-Type: text/plain" \
+  --data-binary "hello"
+```
+
+## Human checkpoint
+
+Confirm bucket policies and public/private access behavior for generated URLs.
+
+## Links
+
+- [Project services hub](/reference/project-services#storage-api)

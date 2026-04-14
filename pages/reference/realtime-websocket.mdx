@@ -1,0 +1,33 @@
+# Realtime (WebSocket)
+
+Use this page with [Global Geobase context](/reference/geobase-context).
+
+## What this service is
+
+Realtime streams database change events over WebSocket.
+
+## When an agent should use it in a Next.js app
+
+Use for live UI updates (feeds, presence, dashboard counters).
+
+## Base URL from CLI output
+
+`wss://{host}/realtime/v1/websocket`
+
+## Auth required
+
+Anon key/session token for subscribed channels, depending on policy.
+
+## Minimal request example
+
+```bash
+# Typical JS clients connect via WebSocket URL from SDK config.
+```
+
+## Human checkpoint
+
+Verify reconnect behavior and channel authorization in production-like latency.
+
+## Links
+
+- [Project services hub](/reference/project-services#realtime-websocket)

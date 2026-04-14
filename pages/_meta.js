@@ -18,8 +18,12 @@ export default {
 	guides: "Guides",
 	extensions: "Extensions",
 	tileserver: "Tile Server",
-	"routing-engine": "Routing Engine",
 	supabase: "Supabase Docs",
+	reference_docs: {
+		title: "",
+		type: "separator",
+	},
+	reference: "Reference",
 	libraries: {
 		title: "Libraries",
 		type: "separator",

@@ -1,0 +1,79 @@
+# Geobase context for app-building agents
+
+This page is the global context for agents that build applications from Geobase CLI output.
+
+## What Geobase is
+
+Geobase has two layers:
+
+- **Geobase platform (control-plane):** account, org, and project metadata APIs.
+- **Geobase project (data-plane):** your project host with REST, Auth, Storage, Realtime, and other runtime APIs.
+
+The CLI command `geobase projects endpoints <ref>` lists mostly project data-plane endpoints, plus selected organization-wide shared services.
+
+## Credential boundaries
+
+- **Platform login session (CLI):** used by `geobase login` to query control-plane metadata.
+- **Project anon key:** client-safe key for browser app calls where allowed.
+- **Project service role key:** server-only key for privileged calls.
+- **Organization Services API key:** for org-wide services such as routing (`https://services.geobase.app/...`), not the project anon key.
+
+## Agent workflow (Next.js-first)
+
+1. **Discover project surface**
+   - `geobase projects endpoints <ref>`
+   - `geobase projects env <ref> --persona web`
+2. **Choose service pages**
+   - Start with Auth, REST, Storage, Realtime, GraphQL, Edge Functions.
+3. **Generate app skeleton**
+   - Create Next.js app with environment placeholders and service clients.
+4. **Wire API calls**
+   - Use per-service docs for URL/auth details and minimal request patterns.
+5. **Human checkpoints**
+   - Verify env values, key placement (public vs server-only), and one request per service.
+
+## Rules for generated apps
+
+- Treat `NEXT_PUBLIC_*` values as public.
+- Never put service-role keys in browser bundles.
+- Prefer server routes/actions for privileged operations.
+- Keep platform API usage (control-plane) separate from project data-plane runtime APIs.
+
+## JavaScript clients (Next.js)
+
+Use two client contexts in generated apps:
+
+- **Browser client:** public values only (`NEXT_PUBLIC_GEOBASE_PROJECT_URL`, `NEXT_PUBLIC_GEOBASE_ANON_KEY`).
+- **Server client:** server-only values for privileged operations (`GEOBASE_SERVICE_ROLE_KEY` when needed).
+
+Minimal browser client pattern:
+
+```ts
+import { createClient } from "@supabase/supabase-js";
+
+export const geobaseBrowserClient = createClient(
+  process.env.NEXT_PUBLIC_GEOBASE_PROJECT_URL!,
+  process.env.NEXT_PUBLIC_GEOBASE_ANON_KEY!
+);
+```
+
+Minimal server client pattern:
+
+```ts
+import { createClient } from "@supabase/supabase-js";
+
+export const geobaseServerClient = createClient(
+  process.env.NEXT_PUBLIC_GEOBASE_PROJECT_URL!,
+  process.env.GEOBASE_SERVICE_ROLE_KEY!
+);
+```
+
+Human checkpoint for client setup:
+
+- Confirm no server-only key is referenced from client components or shipped to browser bundles.
+
+## Related pages
+
+- [Project & organization services](/reference/project-services)
+- [Full stack examples](/reference/full-stack-examples)
+- [Routing engine](/reference/routing-engine)

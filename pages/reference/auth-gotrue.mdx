@@ -1,0 +1,37 @@
+# Auth (GoTrue)
+
+Use this page with [Global Geobase context](/reference/geobase-context).
+
+## What this service is
+
+GoTrue handles user authentication and session lifecycle.
+
+## When an agent should use it in a Next.js app
+
+Use for sign-up, sign-in, sign-out, and session refresh flows.
+
+## Base URL from CLI output
+
+`{origin}/auth/v1`
+
+## Auth required
+
+Anon key for client auth operations; keep service role server-only.
+
+## Minimal request example
+
+```bash
+curl "${GEOBASE_PROJECT_URL}/auth/v1/token?grant_type=password" \
+  -H "apikey: ${GEOBASE_ANON_KEY}" \
+  -H "Content-Type: application/json" \
+  -d '{"email":"user@example.com","password":"secret"}'
+```
+
+## Human checkpoint
+
+Verify session cookies/tokens are stored using your chosen Next.js auth strategy.
+
+## Links
+
+- [Project services hub](/reference/project-services#auth-gotrue)
+- [REST (PostgREST)](/reference/postgrest)

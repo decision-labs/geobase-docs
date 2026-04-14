@@ -1,0 +1,40 @@
+# Worker jobs
+
+Use this page with [Global Geobase context](/reference/geobase-context).
+
+## What this service is
+
+Worker jobs are task-specific endpoints under the project worker API.
+
+## When an agent should use it in a Next.js app
+
+Use for asynchronous actions that should not block request-response cycles.
+
+## Base URL from CLI output
+
+- `{origin}/worker/jobs/osmImportArea`
+- `{origin}/worker/jobs/createGeoEmbeddings`
+- `{origin}/worker/jobs/createSraiEmbeddings`
+
+## Auth required
+
+Use server-side credentials only; do not call these directly from browser code.
+
+## Minimal request example
+
+```bash
+curl -X POST "${GEOBASE_PROJECT_URL}/worker/jobs/createGeoEmbeddings" \
+  -H "apikey: ${GEOBASE_SERVICE_ROLE_KEY}" \
+  -H "Authorization: Bearer ${GEOBASE_SERVICE_ROLE_KEY}" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+## Human checkpoint
+
+Verify payload schema and expected job status lifecycle before wiring UI polling.
+
+## Links
+
+- [Project services hub](/reference/project-services#worker-geoembeddings)
+- [Worker API](/reference/worker-api)

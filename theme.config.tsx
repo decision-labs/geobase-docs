@@ -33,6 +33,9 @@ const config = {
 	},
 	docsRepositoryBase: "https://github.com/decision-labs/geobase-docs",
 	defaultShowCopyCode: true,
+	sidebar: {
+		defaultMenuCollapseLevel: 1,
+	},
 	footer: {
 		content: `Geobase.app © ${new Date().getFullYear()}`,
 	},
