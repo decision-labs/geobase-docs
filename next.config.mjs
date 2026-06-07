@@ -1,9 +1,13 @@
 import nextra from 'nextra'
+import { fileURLToPath } from 'url'
+
+const appRoot = fileURLToPath(new URL('.', import.meta.url))
 
 const withNextra = nextra({
-  theme: 'nextra-theme-docs',
-  themeConfig: './theme.config.tsx',
   defaultShowCopyCode: true,
 })
 
-export default withNextra()
+export default withNextra({
+  reactStrictMode: true,
+  outputFileTracingRoot: appRoot,
+})

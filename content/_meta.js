@@ -1,16 +1,12 @@
 export default {
 	index: "Quick Start",
 	geoai: {
-		title: "GeoAI ↗",
-		type: "page",
+		title: "GeoAI",
 		href: "https://docs.geobase.app/geoai",
-		newWindow: true,
 	},
 	"geoai-live": {
-		title: "GeoAI Live ↗",
-		type: "page",
+		title: "GeoAI Live",
 		href: "https://docs.geobase.app/geoai-live",
-		newWindow: true,
 	},
 	ai: "AI",
 	"importing-data": "Importing Data",
@@ -19,8 +15,8 @@ export default {
 	extensions: "Extensions",
 	tileserver: "Tile Server",
 	supabase: "Supabase Docs",
-	reference_docs: {
-		title: "",
+	"--reference": {
+		title: "Reference",
 		type: "separator",
 	},
 	reference: "Reference",
@@ -32,15 +28,11 @@ export default {
 		title: "🌟 GeoAI.js",
 	},
 	signup: {
-		title: "Sign Up ↗",
-		type: "page",
+		title: "Sign Up",
 		href: "https://studio.geobase.app/sign-up",
-		newWindow: true,
 	},
 	blog: {
-		title: "Blog ↗",
-		type: "page",
+		title: "Blog",
 		href: "https://geobase.app/blog",
-		newWindow: true,
 	},
 };

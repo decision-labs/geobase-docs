@@ -39,16 +39,16 @@ corepack enable
 
 ## Project structure
 
-- `pages/`: MDX docs content (e.g., `pages/guides/...`). Sidebar order and labels are controlled via `_meta.js` files inside subfolders.
+- `content/`: MDX docs content (e.g., `content/guides/...`). Sidebar order and labels are controlled via `_meta.js` files inside subfolders.
 - `components/`: Reusable MDX/React components (e.g., `youtube-embed.tsx`, `geobase-logo.tsx`).
 - `public/`: Static assets served from the site root.
-- `theme.config.tsx`: Site-wide configuration (title, logo, repo links, colors, footer, copy-code button).
+- `app/layout.tsx`: Site-wide Nextra theme configuration (title, logo, repo links, footer, sidebar).
 - `next.config.mjs`: Nextra setup for the docs theme.
 
 ## Adding or editing docs
 
-1. Create a `.mdx` file under `pages/...`.
-2. Update the nearest `pages/**/_meta.js` to include the new page in the sidebar.
+1. Create a `.mdx` file under `content/...`.
+2. Update the nearest `content/**/_meta.js` to include the new page in the sidebar.
 3. Place images in `public/` or alongside the MDX in an `images/` folder; reference relatively.
 4. Prefer absolute internal links (e.g., `/guides/...`) for stable routing.
 5. You can import and use components from `components/` in MDX.
