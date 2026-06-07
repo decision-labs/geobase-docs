@@ -4,9 +4,6 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-overrides:
-  zod: 4.3.6
-
 importers:
 
   .:
@@ -26,6 +23,9 @@ importers:
       react-dom:
         specifier: ^18.3.1
         version: 18.3.1(react@18.3.1)
+      zod:
+        specifier: 4.3.6
+        version: 4.3.6
     devDependencies:
       '@secretlint/secretlint-rule-no-dotenv':
         specifier: ^10.2.2

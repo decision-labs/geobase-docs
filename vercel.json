@@ -1,4 +1,5 @@
 {
+  "installCommand": "corepack enable && corepack prepare pnpm@10.11.1 --activate && pnpm install",
   "rewrites": [
     { "source": "/geoai/_next/image",     "destination": "https://geoai-docs.vercel.app/geoai/_next/image" },
     { "source": "/geoai/_next/:path*",    "destination": "https://geoai-docs.vercel.app/geoai/_next/:path*" },
