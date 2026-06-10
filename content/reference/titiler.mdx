@@ -18,11 +18,14 @@ Use for raster overlays, satellite layers, and elevation/imagery visualization.
 
 Use project keys according to your raster data access policy; prefer server-side token handling for private assets.
 
-## Minimal request example
+## Minimal request examples
 
 ```bash
-curl "${GEOBASE_PROJECT_URL}/titiler/v1/cog/info?url=${COG_URL}" \
-  -H "apikey: ${GEOBASE_ANON_KEY}"
+# COG metadata
+curl "${GEOBASE_PROJECT_URL}/titiler/v1/cog/info?url=${COG_URL}&apikey=${GEOBASE_ANON_KEY}"
+
+# Map extent (WGS84 bounds) — TiTiler 2.x; /cog/bounds was removed
+curl "${GEOBASE_PROJECT_URL}/titiler/v1/cog/WebMercatorQuad/tilejson.json?url=${COG_URL}&apikey=${GEOBASE_ANON_KEY}"
 ```
 
 ## Human checkpoint
