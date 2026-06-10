@@ -1,6 +1,10 @@
-# DuckDB FDW Guide
+---
+title: DuckDB FDW Guide
+---
 
 import { Callout } from 'nextra/components'
+
+# DuckDB FDW Guide
 
 ## Overview
 
@@ -17,6 +21,62 @@ This function can be access by going to:
 ![DuckDB FDW Scripts](../guides/integrations/_duckdb_fdw/09-geobase_templates_duckdb_fdw.png)
 
 {/* pages/guides/integrations/_duckdb_fdw/09-geobase_templates_duckdb_fdw.png */}
+---
+
+## Local read-only DuckDB files
+
+Use `duckdb_fdw` when your Geobase project needs to query a DuckDB file from Postgres. The DuckDB file must already exist and must be readable by Postgres.
+
+The key option is `read_only '1'`:
+
+```sql
+CREATE SERVER local_duckdb
+FOREIGN DATA WRAPPER duckdb_fdw
+OPTIONS (
+  database '/duckdb/example.duckdb',
+  read_only '1'
+);
+```
+
+The `database` option is a fixed path to the DuckDB file on the Geobase Postgres instance. The `read_only '1'` option tells `duckdb_fdw` to open that file without write access. Postgres can query foreign tables backed by the file, but writes through that server should fail.
+
+Create a foreign table that maps to an existing DuckDB table:
+
+```sql
+CREATE FOREIGN TABLE public.places (
+  id integer,
+  name text,
+  lon double precision,
+  lat double precision
+)
+SERVER local_duckdb
+OPTIONS (table 'places');
+```
+
+Query the DuckDB table from Postgres:
+
+```sql
+SELECT id, name, lon, lat
+FROM public.places
+ORDER BY id;
+```
+
+For a Geobase API-facing setup, grant only read access to application roles:
+
+```sql
+REVOKE ALL ON public.places FROM PUBLIC;
+
+GRANT SELECT ON public.places TO authenticated;
+```
+
+A write through the read-only server should fail:
+
+```sql
+INSERT INTO public.places VALUES (3, 'Paris', 2.3522, 48.8566);
+```
+
+Keep write access in a separate bootstrap or ingestion path. Use the read-only server for query paths exposed through Postgres and Geobase APIs.
+
 ---
 
 ## 1️⃣ Creating a DuckDB FDW Server
