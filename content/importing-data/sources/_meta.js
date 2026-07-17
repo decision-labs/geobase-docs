@@ -1,4 +1,5 @@
 export default {
   "sources": "Data Sources",
-  "osm2pgsql": "OpenStreetMap"
+  "osm2pgsql": "OpenStreetMap",
+  "overture": "Overture Maps"
 }

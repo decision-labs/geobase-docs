@@ -1,0 +1,90 @@
+# Importing Overture Maps data into Geobase
+
+Use the project worker job **`overtureImportArea`** to download selected [Overture Maps](https://docs.overturemaps.org/guides/) layers for an area of interest and load them into your Geobase project Postgres.
+
+This is useful when OpenStreetMap coverage is thin (for example buildings for k-block-style workflows). Payload shape is compatible with `osmImportArea` so apps can swap the job path.
+
+## Prerequisites
+
+1. A healthy Geobase project (`project_ref` / `GEOBASE_PROJECT_URL`).
+2. Server-side **`GEOBASE_SERVICE_ROLE_KEY`** (never use this from browser code).
+3. AOI as GeoJSON **Polygon** or **MultiPolygon** in **WGS84** (EPSG:4326), closed rings.
+4. Worker environment has **`GEOBASE_PROJECT_DB_URI`** pointing at the project database (hosted stacks already do).
+
+## Endpoints
+
+| Method | Path |
+|--------|------|
+| POST | `{origin}/worker/jobs/overtureImportArea` |
+| GET | `{origin}/worker/jobs/overtureImportArea/{job_id}` |
+| GET | `{origin}/worker/jobs/overtureImportArea/latest` |
+
+Studio proxy (when using Studio): `/api/projects/{ref}/jobs/overtureImportArea`.
+
+OpenAPI / Swagger on the worker: `{origin}/worker/doc` and `{origin}/worker/ui`.
+
+## Layer selection
+
+Resolution order:
+
+1. **`types`** — Overture feature types (preferred), e.g. `["building", "segment", "water"]`
+2. **`topics`** — shortbread/kblock aliases or type names, e.g. `["buildings", "streets"]` or `["kblock"]` → buildings only
+3. Default — `["building"]` if both omitted
+
+### Common types → tables
+
+| `types` | Output table |
+|---------|----------------|
+| `building` | `{prefix}_buildings` |
+| `segment` | `{prefix}_streets` |
+| `water` | `{prefix}_water` |
+| `place` | `{prefix}_places` |
+| `land_use` | `{prefix}_land_use` |
+
+Full list and aliases: worker OpenAPI description and [geobase-skills `@geobase-worker-overture-import`](https://github.com/decision-labs/geobase-skills).
+
+### Output columns
+
+`area_id` (bigint), `geom` (4326), `tags` (jsonb), `source` = `overture`.
+
+## Example request
+
+```bash
+curl -sS -X POST "${GEOBASE_PROJECT_URL}/worker/jobs/overtureImportArea" \
+  -H "apikey: ${GEOBASE_SERVICE_ROLE_KEY}" \
+  -H "Authorization: Bearer ${GEOBASE_SERVICE_ROLE_KEY}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "areaName": "demo_aoi",
+    "tablePrefix": "demo_aoi",
+    "types": ["building", "segment"],
+    "mode": "replace",
+    "aoiGeoJson": {
+      "type": "Polygon",
+      "coordinates": [[[10.0, 59.0], [10.1, 59.0], [10.1, 59.1], [10.0, 59.1], [10.0, 59.0]]]
+    }
+  }'
+```
+
+Poll until `status` is `success` or `failed`:
+
+```bash
+curl -sS "${GEOBASE_PROJECT_URL}/worker/jobs/overtureImportArea/<job_id>" \
+  -H "apikey: ${GEOBASE_SERVICE_ROLE_KEY}" \
+  -H "Authorization: Bearer ${GEOBASE_SERVICE_ROLE_KEY}"
+```
+
+On success, job `metadata` includes `types`, `layers` (`[{ type, table, inserted }]`), and totals.
+
+## Modes and size limits
+
+- **`mode`:** `replace` (default) clears each target table before insert; `union` appends / upserts by `area_id`.
+- Imports use the AOI **bounding box** (exact polygon clip is a follow-up).
+- Worker size guards (env, fail fast): `OVERTURE_MAX_BBOX_AREA_SQ_DEG` (default `1.0`), `OVERTURE_MAX_FEATURES_PER_TYPE` (`50000`), `OVERTURE_MAX_FEATURES_TOTAL` (`100000`). Prefer small AOIs; start with one type.
+
+## Related
+
+- [Worker jobs](/reference/worker-jobs)
+- [Worker API](/reference/worker-api)
+- [Project services hub](/reference/project-services#worker-overture-import)
+- [OSM import (osm2pgsql)](./osm2pgsql.mdx) — complementary OpenStreetMap path

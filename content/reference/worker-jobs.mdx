@@ -13,12 +13,22 @@ Use for asynchronous actions that should not block request-response cycles.
 ## Base URL from CLI output
 
 - `{origin}/worker/jobs/osmImportArea`
+- `{origin}/worker/jobs/overtureImportArea`
 - `{origin}/worker/jobs/createGeoEmbeddings`
 - `{origin}/worker/jobs/createSraiEmbeddings`
 
 ## Auth required
 
 Use server-side credentials only; do not call these directly from browser code.
+
+## Job quick reference
+
+| Job | Purpose | Guide |
+|-----|---------|-------|
+| `osmImportArea` | OpenStreetMap extract → project tables | [OSM / osm2pgsql](/importing-data/sources/osm2pgsql) |
+| `overtureImportArea` | Overture Maps layers → `{prefix}_{suffix}` tables | [Overture import](/importing-data/sources/overture) |
+| `createGeoEmbeddings` | GeoAI / GeoTIFF embeddings | [GeoEmbeddings](/ai/geoembeddings/geoparquet) |
+| `createSraiEmbeddings` | SRAI OSM + H3 embeddings | [Automated SRAI pipeline](/guides/srai/automated_srai_pipeline) |
 
 ## Minimal request example
 
@@ -29,6 +39,8 @@ curl -X POST "${GEOBASE_PROJECT_URL}/worker/jobs/createGeoEmbeddings" \
   -H "Content-Type: application/json" \
   -d '{}'
 ```
+
+For Overture, see the [Overture import guide](/importing-data/sources/overture) (requires `areaName`, `aoiGeoJson`, optional `types` / `topics`).
 
 ## Human checkpoint
 
