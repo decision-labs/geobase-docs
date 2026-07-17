@@ -1,0 +1,86 @@
+# Agent skills for Geobase
+
+[Geobase skills](https://github.com/decision-labs/geobase-skills) are playbooks for coding agents (Cursor and other [Agent Skills](https://github.com/vercel-labs/skills)-compatible tools). They teach agents how to use Geobase project APIs, worker jobs, maps, and GeoEmbeddings without inventing endpoints or mixing platform vs project credentials.
+
+> **Private beta** — Installing skills requires GitHub access to `decision-labs/geobase-skills`. During beta, use **Geobase Studio** for project URL, ref, and anon key; put service-role and database secrets only in local gitignored env files (never in chat).
+
+## Install
+
+Compatible with the Skills CLI (`npx skills`).
+
+### All skills (recommended)
+
+```bash
+# Cursor, this project
+npx skills add decision-labs/geobase-skills --skill '*' -a cursor -y
+
+# Cursor, user-wide
+npx skills add decision-labs/geobase-skills --skill '*' -a cursor -g -y
+```
+
+### One skill
+
+```bash
+npx skills add decision-labs/geobase-skills --skill geobase-tileserver --yes
+```
+
+### List what is in the repo
+
+```bash
+npx skills add decision-labs/geobase-skills --list
+```
+
+Bundle page: [skills.sh/decision-labs/geobase-skills](https://skills.sh/decision-labs/geobase-skills). Public search (`npx skills find geobase`) may be empty while install counts are low — use `--list` instead.
+
+## Start with the umbrella skill
+
+Always load **`@geobase`** first. It covers:
+
+- Private-beta Studio setup (project URL, ref, anon key)
+- Secrets workflow (human in the loop)
+- Control-plane (platform) vs data-plane (project) scope
+- Routing to focused skills
+
+```bash
+npx skills add decision-labs/geobase-skills@geobase -g -y
+```
+
+## Skill catalog
+
+| Area | Skill | What it helps with |
+|------|-------|--------------------|
+| **Platform** | `@geobase` | Setup, secrets, routing |
+| **GeoEmbeddings** | `@geobase-embeddings` | Index / which step next |
+| | `@geobase-embeddings-create-via-workers` | Create tables via workers only |
+| | `@geobase-embeddings-catalogue-management` | Catalogue list / visibility / delete |
+| | `@geobase-embeddings-rpc-applications` | `similarity_search`, change detection |
+| | `@geobase-embeddings-troubleshooting` | Job / RPC failures |
+| **Workers** | `@geobase-worker-srai-embeddings` | `createSraiEmbeddings` (OSM + H3) |
+| | `@geobase-worker-geoai-embeddings` | `createGeoEmbeddings` (raster) |
+| | `@geobase-worker-osm-import` | `osmImportArea` |
+| | `@geobase-worker-overture-import` | `overtureImportArea` |
+| **Maps** | `@geobase-tileserver` | Vector MVT / MapLibre |
+| | `@geobase-titiler` | Raster COG / Titiler |
+| **Data** | `@geobase-project-db-data-import` | Local files → Postgres (`ogr2ogr`) |
+
+Authoritative metadata: [`skills/catalog.json`](https://github.com/decision-labs/geobase-skills/blob/main/skills/catalog.json) in the skills repo.
+
+## How this relates to these docs
+
+Skills point agents at the same public docs and APIs:
+
+| Topic | Docs |
+|-------|------|
+| Project service URLs | [Project services](/reference/project-services) |
+| Worker jobs | [Worker jobs](/reference/worker-jobs) |
+| Overture import | [Overture Maps import](/importing-data/sources/overture) |
+| SRAI embeddings | [Automated SRAI pipeline](/guides/srai/automated_srai_pipeline) |
+| Vector tiles | [Tileserver](/reference/tileserver) |
+| Raster tiles | [Titiler](/reference/titiler) |
+
+When product behaviour changes, maintainers update **both** [geobase-docs](https://github.com/decision-labs/geobase-docs) and [geobase-skills](https://github.com/decision-labs/geobase-skills) (see the monorepo merge checklist).
+
+## Related links
+
+- Source: [decision-labs/geobase-skills](https://github.com/decision-labs/geobase-skills)
+- Skills CLI: [vercel-labs/skills](https://github.com/vercel-labs/skills)
