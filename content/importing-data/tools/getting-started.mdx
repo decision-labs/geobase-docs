@@ -1,5 +1,11 @@
 # Tools for importing data
 
-1. osm2pgsql (for OpenStreetMap data)
-2. ogr2ogr (for most GIS formats)
-3. QGIS (for most GIS formats)
+| Tool | Best for |
+|------|----------|
+| **Studio Data Importer** (map imports) | AOI-based OSM and Overture into a Geobase project |
+| **Worker jobs** (`osmImportArea`, `overtureImportArea`) | Same imports from apps, agents, or CI |
+| **QGIS** | Interactive load of common GIS files into PostGIS |
+| **ogr2ogr** | Scripted file → PostGIS |
+| **osm2pgsql** | Large local OSM PBF extracts / custom Lua |
+
+Start at [Importing data](../getting-started.mdx).

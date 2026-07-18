@@ -1,29 +1,37 @@
-# Importing Data into Geobase
+# Importing data into Geobase
 
-Geobase supports importing various types of geospatial data through different tools and methods. Use the table below to find the right tool for your data format and source.
+Bring geospatial data into your **Geobase project** (PostGIS), then explore it in Table Editor and the Tile Server.
 
-## Tool Selection Guide
+## Prefer Studio when you can
 
-| Format/Source | Recommended Tool | Alternative Tool | Guide |
-|--------------|------------------|------------------|-------|
-| OpenStreetMap (.osm.pbf) | osm2pgsql | - | [OSM Import Guide](./sources/osm2pgsql.mdx) 🗺️ |
-| Shapefile (.shp) | QGIS | ogr2ogr | [QGIS Import Guide](../guides/gis-analyst/importing-from-qgis.mdx) 🔧 |
-| GeoJSON (.geojson) | QGIS | ogr2ogr | [QGIS Import Guide](../guides/gis-analyst/importing-from-qgis.mdx) 🔧 |
-| KML (.kml) | QGIS | ogr2ogr | [GIS Formats Guide](./formats/gis-formats.mdx) 📚 |
-| GeoPackage (.gpkg) | QGIS | ogr2ogr | [GIS Formats Guide](./formats/gis-formats.mdx) 📚 |
-| ESRI Geodatabase (.gdb) | QGIS | ogr2ogr | [GIS Formats Guide](./formats/gis-formats.mdx) 📚 |
-| PostGIS | Direct Import | - | [GIS Formats Guide](./formats/gis-formats.mdx) 📚 |
-| CSV with coordinates | QGIS | ogr2ogr | [GIS Formats Guide](./formats/gis-formats.mdx) 📚 |
-| Overture Maps | Worker `overtureImportArea` | - | [Overture Import Guide](./sources/overture.mdx) 🗺️ |
+In Studio, open **Data Importer** for your project:
 
+| Path | What it does |
+|------|----------------|
+| **Map imports → OSM Import Map** | Draw an AOI, pick OSM topics, run worker job `osmImportArea` |
+| **Map imports → Overture Import Map** | Draw an AOI, pick Overture types, run worker job `overtureImportArea` |
 
-## Import Process Overview
+You can cancel a pending/running map-import job from the sidebar. Stopping child processes (e.g. osm2pgsql) may still be best-effort depending on worker version.
 
-1. Choose your tool from the table above
-2. Follow the corresponding guide for detailed instructions
-3. After import, verify data in the dashboard and enable in TileServer
+Browse / URL / Upload / Live Sources are evolving; for file-based GIS formats, use QGIS or `ogr2ogr` below.
 
-## Need Help?
+## Choose a path
 
-- Check the detailed guides linked in the table
-- Join our [Discord community](https://geobase.app/discord) for support
+| Source / format | Recommended | Also | Guide |
+|-----------------|-------------|------|-------|
+| OpenStreetMap (AOI) | Studio **OSM Import Map** | Worker API `osmImportArea` | [OpenStreetMap](./sources/osm.mdx) |
+| Overture Maps (AOI) | Studio **Overture Import Map** | Worker API `overtureImportArea` | [Overture Maps](./sources/overture.mdx) |
+| Large local `.osm.pbf` / custom Lua | `osm2pgsql` on your machine | — | [osm2pgsql (advanced)](./sources/osm2pgsql.mdx) |
+| Shapefile, GeoJSON, GeoPackage, … | QGIS | `ogr2ogr` | [QGIS](../guides/gis-analyst/importing-from-qgis.mdx), [formats](./formats/gis-formats.mdx) |
+
+## After import
+
+1. Confirm tables in **Table Editor** (and `source` / provenance columns where applicable).
+2. Expose layers in the **Tile Server** if you need MapLibre tiles.
+3. For agent / CI automation, use the [worker jobs](/reference/worker-jobs) endpoints with a service role key (never from the browser).
+
+## Help
+
+- [Worker jobs reference](/reference/worker-jobs)
+- [Project services hub](/reference/project-services)
+- [Discord](https://geobase.app/discord)

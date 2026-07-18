@@ -1,0 +1,79 @@
+# Importing OpenStreetMap data into Geobase
+
+Use the project worker job **`osmImportArea`** (or Studio **OSM Import Map**) to extract OpenStreetMap features for an area of interest into your Geobase project Postgres.
+
+For large offline `.osm.pbf` files or custom Lua transforms, see [osm2pgsql (advanced)](./osm2pgsql.mdx).
+
+## Studio (recommended)
+
+1. Open your project → **Data Importer** → **Map imports** → **OSM Import Map**.
+2. Draw one or more polygons / rectangles on the map.
+3. Name each area (used as table prefix; letters, numbers, underscores).
+4. Select **OSM topics** (e.g. buildings, streets, water).
+5. Click import and wait for the job to finish (or **Cancel** while pending/running).
+
+Tables appear as `{prefix}_…` depending on topics. Enable them in the Tile Server when you need tiles.
+
+## Prerequisites (API)
+
+1. Healthy Geobase project (`GEOBASE_PROJECT_URL` / project `ref`).
+2. Server-side **`GEOBASE_SERVICE_ROLE_KEY`** (never from browser code).
+3. AOI as GeoJSON **Polygon** or **MultiPolygon**, WGS84 (EPSG:4326), closed rings.
+
+## Endpoints
+
+| Method | Path |
+|--------|------|
+| POST | `{origin}/worker/jobs/osmImportArea` |
+| GET | `{origin}/worker/jobs/osmImportArea/{job_id}` |
+| GET | `{origin}/worker/jobs/osmImportArea/latest` |
+| DELETE | `{origin}/worker/jobs/osmImportArea/{job_id}` — cancel pending/running |
+
+Studio proxy: `/api/projects/{ref}/jobs/osmImportArea` (same methods).
+
+OpenAPI: `{origin}/worker/doc` and `{origin}/worker/ui`.
+
+## Topics
+
+Pass optional `topics` (string array). Common values include `buildings`, `streets`, `water`, `places`, and other shortbread-style topic names supported by the worker. Omit to use the worker default set.
+
+## Example request
+
+```bash
+curl -sS -X POST "${GEOBASE_PROJECT_URL}/worker/jobs/osmImportArea" \
+  -H "apikey: ${GEOBASE_SERVICE_ROLE_KEY}" \
+  -H "Authorization: Bearer ${GEOBASE_SERVICE_ROLE_KEY}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "areaName": "demo_aoi",
+    "tablePrefix": "demo_aoi",
+    "topics": ["buildings", "streets", "water"],
+    "aoiGeoJson": {
+      "type": "Polygon",
+      "coordinates": [[[10.0, 59.0], [10.1, 59.0], [10.1, 59.1], [10.0, 59.1], [10.0, 59.0]]]
+    }
+  }'
+```
+
+Poll until `status` is `success` or `failed`:
+
+```bash
+curl -sS "${GEOBASE_PROJECT_URL}/worker/jobs/osmImportArea/<job_id>" \
+  -H "apikey: ${GEOBASE_SERVICE_ROLE_KEY}" \
+  -H "Authorization: Bearer ${GEOBASE_SERVICE_ROLE_KEY}"
+```
+
+Cancel:
+
+```bash
+curl -sS -X DELETE "${GEOBASE_PROJECT_URL}/worker/jobs/osmImportArea/<job_id>" \
+  -H "apikey: ${GEOBASE_SERVICE_ROLE_KEY}" \
+  -H "Authorization: Bearer ${GEOBASE_SERVICE_ROLE_KEY}"
+```
+
+## Related
+
+- [Overture Maps import](./overture.mdx) — fuller building coverage when OSM mapping is thin
+- [osm2pgsql (advanced)](./osm2pgsql.mdx)
+- [Worker jobs](/reference/worker-jobs)
+- [Agent skill](/guides/software-developer/agent-skills) `@geobase-worker-osm-import`

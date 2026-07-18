@@ -1,11 +1,18 @@
-# Data Sources
+# Data sources
 
-## Open Source
-1. OpenStreetMap
-2. Overture Maps
+## Open map data (AOI → project tables)
 
-## Commercial
-1. ESRI ArcGIS
-2. Google Maps
-3. HERE Maps
-4. Mapbox
+| Source | Studio | Worker job | Guide |
+|--------|--------|------------|-------|
+| [OpenStreetMap](https://www.openstreetmap.org/) | OSM Import Map | `osmImportArea` | [OpenStreetMap](./osm.mdx) |
+| [Overture Maps](https://docs.overturemaps.org/guides/) | Overture Import Map | `overtureImportArea` | [Overture Maps](./overture.mdx) |
+
+OSM and Overture are complementary: OSM is strong for roads/hydro and community mapping; Overture often has fuller building (and other) coverage for the same AOI.
+
+## Files and desktop GIS
+
+Shapefile, GeoJSON, GeoPackage, KML, etc. — import with [QGIS](../../guides/gis-analyst/importing-from-qgis.mdx) or [ogr2ogr](../formats/gis-formats.mdx).
+
+## Advanced OSM extracts
+
+For full `.osm.pbf` extracts and custom styles (e.g. 3D buildings), use [osm2pgsql](./osm2pgsql.mdx) against your project database connection string.
