@@ -1,7 +1,13 @@
 import { Callout } from 'nextra/components';
 import YouTubeEmbed from '../../../components/youtube-embed';
 
-# Importing OpenStreetMap (OSM) Data into Geobase
+# Importing OpenStreetMap with osm2pgsql (advanced)
+
+Use this path for **large local `.osm.pbf` extracts** or **custom Lua** (for example 3D buildings). For everyday AOI imports in a hosted project, prefer Studio **OSM Import Map** or the worker job — see [OpenStreetMap import](./osm.mdx).
+
+<Callout type="info" emoji="ℹ️">
+  Most users should start with [OpenStreetMap import](./osm.mdx) (Studio or `osmImportArea`). This guide is for desktop / CI workflows that run `osm2pgsql` against your project connection string.
+</Callout>
 
 In this guide, we'll walk you through importing buildings data from OSM into your Geobase PostgreSQL database using `osm2pgsql`. The buildings will have heights and will be displayed as 3D buildings in Geobase.
 
