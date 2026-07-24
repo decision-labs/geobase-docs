@@ -1,0 +1,96 @@
+# Archive PostGIS tables to PMTiles
+
+Use the project worker job **`archiveToPmtiles`** (or Studio **Tile Server → Tables → Archive to PMTiles**) to export one PostGIS table into a [PMTiles](https://github.com/protomaps/PMTiles) archive in project Storage.
+
+Useful when you want a durable, portable vector-tile snapshot of a table (offline maps, sharing, or serving outside live `tileserver`).
+
+## Studio (recommended)
+
+1. Create a Storage bucket named **`pmtiles`** (v1 does not auto-create it).
+2. Open your project → **Tile Server** → **Tables**.
+3. Select one or more tables → **Archive N to PMTiles**.
+4. Wait for the job banner; the Archive column shows the date from `{table}.snapshot.json` when present.
+
+Multi-table selection runs **one job per table**.
+
+## Prerequisites (API)
+
+1. Healthy Geobase project (`GEOBASE_PROJECT_URL` / project `ref`).
+2. Server-side **`GEOBASE_SERVICE_ROLE_KEY`** (never from browser code).
+3. Storage bucket **`pmtiles`** already exists.
+4. Table has geometry suitable for vector tiles; identifiers match `^[A-Za-z_][A-Za-z0-9_]*$`.
+
+## Endpoints
+
+| Method | Path |
+|--------|------|
+| POST | `{origin}/worker/jobs/archiveToPmtiles` |
+| GET | `{origin}/worker/jobs/archiveToPmtiles` — list |
+| GET | `{origin}/worker/jobs/archiveToPmtiles/{job_id}` |
+| GET | `{origin}/worker/jobs/archiveToPmtiles/latest` |
+| DELETE | `{origin}/worker/jobs/archiveToPmtiles/{job_id}` — cancel pending/running |
+
+Studio proxy: `/api/projects/{ref}/jobs/archiveToPmtiles` (injects `projectTarget` for the shared worker pool).
+
+OpenAPI: `{origin}/worker/doc` and `{origin}/worker/ui`.
+
+## Request
+
+Happy path:
+
+```json
+{ "table": "buildings" }
+```
+
+| Field | Required | Default |
+|-------|----------|---------|
+| `table` | yes | — |
+| `schema` | no | `public` |
+| `minZoom` / `maxZoom` | no | `1` / `15` |
+| `projectTarget` | shared pool | injected by Studio |
+
+## Storage layout
+
+| Object | Role |
+|--------|------|
+| `pmtiles/{table}.pmtiles` | Archive (overwrite on re-run) |
+| `pmtiles/{table}.snapshot.json` | Snapshot metadata (overwrite with archive) |
+
+On success, snapshot fields are also mirrored on job `metadata.snapshot`.
+
+## Size guards
+
+Jobs fail fast before `ogr2ogr` (and again on output size) when fleet limits are exceeded. Error messages start with `[pmtiles size guard]`.
+
+Typical fleet defaults (env `0` disables that check):
+
+| Env | Default |
+|-----|---------|
+| `PMTILES_MAX_ROWS` | `500000` |
+| `PMTILES_MAX_RELATION_BYTES` | `536870912` (512 MiB) |
+| `PMTILES_MAX_ZOOM` | `15` |
+| `PMTILES_MAX_ZOOM_SPAN` | `15` |
+| `PMTILES_MAX_OUTPUT_BYTES` | `536870912` (512 MiB) |
+
+## Curl example
+
+```bash
+curl -sS -X POST "${GEOBASE_PROJECT_URL}/worker/jobs/archiveToPmtiles" \
+  -H "apikey: ${GEOBASE_SERVICE_ROLE_KEY}" \
+  -H "Authorization: Bearer ${GEOBASE_SERVICE_ROLE_KEY}" \
+  -H "Content-Type: application/json" \
+  -d '{"table":"buildings"}'
+```
+
+Shared-pool callers use `https://services.geobase.app/worker/jobs/archiveToPmtiles` with an org Services API key and a `projectTarget` object (Studio injects this for you).
+
+## Human checkpoint
+
+Confirm the `pmtiles` bucket exists and the table is small enough for fleet size guards before wiring UI polling.
+
+## Links
+
+- [Worker jobs](/reference/worker-jobs)
+- [Worker API](/reference/worker-api)
+- [Project services hub](/reference/project-services#worker-archive-to-pmtiles)
+- [Storage API](/reference/storage-api)

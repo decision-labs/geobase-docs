@@ -16,6 +16,7 @@ Use for asynchronous actions that should not block request-response cycles.
 - `{origin}/worker/jobs/overtureImportArea`
 - `{origin}/worker/jobs/createGeoEmbeddings`
 - `{origin}/worker/jobs/createSraiEmbeddings`
+- `{origin}/worker/jobs/archiveToPmtiles`
 
 ## Auth required
 
@@ -29,6 +30,7 @@ Use server-side credentials only; do not call these directly from browser code.
 | `overtureImportArea` | Overture Maps layers → `{prefix}_{suffix}` tables | [Overture import](/importing-data/sources/overture) |
 | `createGeoEmbeddings` | GeoAI / GeoTIFF embeddings | [GeoEmbeddings](/ai/geoembeddings/geoparquet) |
 | `createSraiEmbeddings` | SRAI OSM + H3 embeddings | [Automated SRAI pipeline](/guides/srai/automated_srai_pipeline) |
+| `archiveToPmtiles` | PostGIS table → Storage `pmtiles/{table}.pmtiles` | [Archive to PMTiles](/guides/gis-analyst/archive-to-pmtiles) |
 
 Cancel pending/running jobs with `DELETE {origin}/worker/jobs/{taskName}/{job_id}` (Studio: `DELETE /api/projects/{ref}/jobs/{taskName}/{job_id}`).
 
@@ -44,11 +46,13 @@ curl -X POST "${GEOBASE_PROJECT_URL}/worker/jobs/createGeoEmbeddings" \
 
 For map imports, see [OpenStreetMap](/importing-data/sources/osm) and [Overture](/importing-data/sources/overture) (require `areaName`, `aoiGeoJson`, plus `topics` or `types`).
 
+For table archives, see [Archive to PMTiles](/guides/gis-analyst/archive-to-pmtiles) (requires `{ "table": "…" }` and a Storage bucket named `pmtiles`).
+
 ## Human checkpoint
 
 Verify payload schema and expected job status lifecycle before wiring UI polling.
 
 ## Links
 
-- [Project services hub](/reference/project-services#worker-geoembeddings)
+- [Project services hub](/reference/project-services#worker-archive-to-pmtiles)
 - [Worker API](/reference/worker-api)
