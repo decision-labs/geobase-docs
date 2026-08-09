@@ -97,9 +97,9 @@ Row `id`s intentionally match CLI deep links from `geobase projects endpoints`.
     </tr>
     <tr id="worker-geoembeddings">
       <td><span id="worker-geoembeddings"></span>Worker: GeoEmbeddings</td>
-      <td><code>{'{'}origin{'}'}/worker/jobs/createGeoEmbeddings</code></td>
-      <td><a href="/reference/worker-jobs">Worker jobs</a></td>
-      <td>Background embedding generation pipeline.</td>
+      <td><code>{'{'}origin{'}'}/worker/jobs/createGeoEmbeddings</code> (Studio/shared: see <a href="/reference/worker-api">Worker API</a>)</td>
+      <td><a href="/reference/worker-jobs">Worker jobs</a> · <a href="/guides/geoembeddings/rpc-api">RPC API</a></td>
+      <td>Background embedding generation; query results via RPC.</td>
     </tr>
     <tr id="worker-srai-embeddings">
       <td><span id="worker-srai-embeddings"></span>Worker: SRAI embeddings</td>
@@ -141,6 +141,12 @@ Same host for all orgs in a Geobase deployment. Use an organization Services API
       <td><code>{'{'}services_origin{'}'}/routing-engine/v1/route</code> (POST)</td>
       <td><a href="/reference/routing-engine">Routing engine</a></td>
       <td>Call from server-side code with org Services API key.</td>
+    </tr>
+    <tr id="shared-worker-pool">
+      <td><span id="shared-worker-pool"></span>Shared Worker pool</td>
+      <td><code>{'{'}services_origin{'}'}/worker</code> (OpenAPI <code>/worker/doc</code>)</td>
+      <td><a href="/reference/worker-api">Worker API</a> · <a href="/reference/worker-jobs">Worker jobs</a></td>
+      <td>Org Services API key + <code>projectRef</code> scoping. Staging: <code>https://services.staging.geobase.app/worker</code>.</td>
     </tr>
   </tbody>
 </table>

@@ -1,14 +1,35 @@
 import { Callout } from 'nextra/components'
 
-# GeoEmbeddings + GeoParquet (placeholder)
+# Connect to GeoParquet
 
-<Callout type="warning" emoji="⏳">
-  This page is a temporary placeholder. The full “Connect to GeoParquet” guide is coming soon.
+Download **GeoParquet** (and optional metadata JSON) that a GeoEmbeddings worker job uploaded to project Storage. This is for OLAP / DuckDB / pandas — **not** the online [RPC API](/guides/geoembeddings/rpc-api).
+
+<Callout type="info">
+  Artifacts exist only if the job set <code>uploadArtifactsToStorage: true</code>. Studio stores bucket/object paths under <code>embeddings_catalogue.data_source.artifacts</code> and mints time-limited signed HTTPS URLs on the table details panel.
 </Callout>
 
-This placeholder covers the GeoEmbeddings artifacts flow in Studio:
+## Studio flow
 
-- Worker uploads GeoParquet artifacts to Supabase Storage
-- Studio generates time-limited signed HTTPS URLs
-- “Connect to GeoParquet” provides ready-to-run snippets (curl, Python, DuckDB)
+1. Open the embeddings table → **Table details**.
+2. If artifacts exist, use the signed links (refresh when expired).
+3. **Connect to GeoParquet** offers copy-paste snippets: **curl**, **Python**, **DuckDB**.
 
+## Typical usage
+
+**curl** — download to disk, then open locally.
+
+**Python** — `pandas.read_parquet(url)` or `geopandas.read_parquet(url)` with the signed URL (needs a working pyarrow HTTPS setup; otherwise curl first).
+
+**DuckDB** — load `httpfs` + `spatial`, then `read_parquet('…signed URL…')`.
+
+**Mint your own URL** — with service-role credentials:
+
+```python
+# conceptual; use supabase-py against GEOBASE_PROJECT_URL
+supabase.storage.from_(bucket).create_signed_url(object_path, expires_in_seconds)
+```
+
+## Related
+
+- Create jobs: [Worker jobs](/reference/worker-jobs) · `createGeoEmbeddings` / `createSraiEmbeddings`
+- Online search: [RPC API](/guides/geoembeddings/rpc-api)

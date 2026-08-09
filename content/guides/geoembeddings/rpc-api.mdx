@@ -1,0 +1,118 @@
+import { Callout } from 'nextra/components'
+
+# GeoEmbeddings RPC API
+
+Query embeddings **already stored in Postgres** via PostgREST RPCs on the `geoembeddings` schema. This is the path Studio’s **Connect with JavaScript** dialog uses.
+
+<Callout type="info">
+  **RPC vs worker vs GeoParquet:** RPC searches data in the project database. The [Worker API](/reference/worker-api) *creates* embeddings (async jobs). [GeoParquet](/ai/geoembeddings/geoparquet) is for signed Storage downloads (OLAP / DuckDB), not online similarity search.
+</Callout>
+
+## Auth and client setup
+
+Use your project URL and key (`GEOBASE_PROJECT_URL`, `GEOBASE_ANON_KEY` or service role). Point the JS client at the **`geoembeddings`** schema so `rpc(...)` resolves the SQL API.
+
+```ts
+import { createClient } from '@supabase/supabase-js'
+
+function createGeoEmbeddingsGeobaseClient(projectUrl: string, apiKey: string) {
+  return createClient(projectUrl, apiKey, {
+    db: { schema: 'geoembeddings' },
+  })
+}
+
+const geobase = createGeoEmbeddingsGeobaseClient(
+  process.env.GEOBASE_PROJECT_URL!,
+  process.env.GEOBASE_ANON_KEY!,
+)
+
+const { data, error } = await geobase.rpc('similarity_search', {
+  table_name: 'your_embeddings_table',
+  patch_id: 1,
+})
+```
+
+PostgREST picks the PostgreSQL overload from the **parameter names** you send. There is no separate JS API contract beyond those keys.
+
+A published `@geobase/geoembeddings` package is planned; until then, use the factory above (same pattern as Studio).
+
+## Function reference
+
+Supported entry points: `similarity_search` and `change_detection`. Optional parameters use the defaults below unless noted.
+
+### Defaults
+
+| Parameter | Default |
+| --- | --- |
+| `similarity_threshold` | `0.0` (return all) |
+| `result_limit` | `NULL` (no limit) |
+| `result_offset` | `0` |
+| `include_geom` | `false` |
+| `include_embeddings` | `false` |
+| `spatial_filter` | `NULL` (GeoJSON Polygon/MultiPolygon; intersect filter after similarity) |
+| `srid` | `4326` |
+| `radius` | `NULL` (point query: containing patch; if set, circle average via `ST_DWithin`) |
+| `unit` | `'m'` (`'m'` or `'deg'` for `radius`) |
+
+`change_detection` returns `change_score = 1 - similarity` (implemented via `similarity_search`).
+
+### `similarity_search` overloads
+
+| Input | Required keys | Optional extras |
+| --- | --- | --- |
+| Patch id | `table_name`, `patch_id` | `label_name`, threshold/limit/offset, geom/embeddings flags, `spatial_filter`, `srid` |
+| Point / circle | `table_name`, `lon`, `lat` | `label_name`, `radius`, `unit`, same optionals |
+| Polygon | `table_name`, `query_geometry` (Polygon/MultiPolygon) | `label_name`, same optionals |
+| Two tables | `table_name_1`, `table_name_2` | `label_name`, same optionals |
+
+Examples:
+
+```ts
+// By patch
+await geobase.rpc('similarity_search', {
+  table_name: 'my_table',
+  patch_id: 42,
+  result_limit: 20,
+  include_geom: true,
+})
+
+// By point (optional radius in meters)
+await geobase.rpc('similarity_search', {
+  table_name: 'my_table',
+  lon: 13.4,
+  lat: 52.5,
+  radius: 500,
+  unit: 'm',
+})
+
+// Two tables
+await geobase.rpc('similarity_search', {
+  table_name_1: 't0',
+  table_name_2: 't1',
+  similarity_threshold: 0.8,
+})
+```
+
+### `change_detection`
+
+| Required | Optional |
+| --- | --- |
+| `table_name_1`, `table_name_2` | `label_name`, threshold/limit/offset, geom/embeddings flags, `spatial_filter`, `srid` |
+
+```ts
+await geobase.rpc('change_detection', {
+  table_name_1: 'before',
+  table_name_2: 'after',
+  include_geom: true,
+})
+```
+
+## Python
+
+Same env names (`GEOBASE_PROJECT_URL`, `GEOBASE_ANON_KEY`) with `supabase-py`. Call `rpc('similarity_search', { ... })` with the same parameter keys. Prefer a trusted environment for the service role key.
+
+## Related
+
+- Create embeddings (jobs): [Worker jobs](/reference/worker-jobs) · [Automated SRAI pipeline](/guides/srai/automated_srai_pipeline)
+- GeoParquet downloads: [Connect to GeoParquet](/ai/geoembeddings/geoparquet)
+- AI section index: [GeoEmbeddings](/ai/geoembeddings)

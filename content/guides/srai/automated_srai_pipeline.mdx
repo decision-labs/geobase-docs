@@ -10,8 +10,9 @@ Geobase can run the same **OSM → H3 → join → CountEmbedder** pipeline desc
 ## Worker task
 
 - **Task name:** `createSraiEmbeddings`
-- **HTTP (OpenAPI):** `POST /jobs/createSraiEmbeddings` on the project worker (same host pattern as `createGeoEmbeddings`).
+- **HTTP (OpenAPI):** `POST /jobs/createSraiEmbeddings` on the [Worker API](/reference/worker-api) base (`/doc` for schemas). Same auth and `projectRef` rules as `createGeoEmbeddings`.
 - **MVP embedder:** `embedderProfile: "count"` (CountEmbedder + `OSMOnlineLoader`), model catalogue name `srai-count-osm-v1`.
+- After insert, query vectors with the [GeoEmbeddings RPC API](/guides/geoembeddings/rpc-api) (separate from this job API).
 
 ### Request body (conceptual)
 

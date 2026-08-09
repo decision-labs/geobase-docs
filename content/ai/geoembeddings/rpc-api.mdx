@@ -1,19 +1,26 @@
 import { Callout } from 'nextra/components'
 
-# GeoEmbeddings RPC API (placeholder)
+# GeoEmbeddings RPC API
 
-<Callout type="warning" emoji="⏳">
-  This page is a temporary placeholder. The full RPC API docs are coming soon.
+<Callout type="info">
+  Canonical guide: **[GeoEmbeddings RPC API](/guides/geoembeddings/rpc-api)** (Studio “More details” links there).
 </Callout>
 
-Studio links to this page from the GeoEmbeddings UI (“More details (GeoEmbeddings RPC API)”).
-
-## Minimal usage pattern
+Query embeddings in Postgres via `similarity_search` / `change_detection` on the `geoembeddings` schema.
 
 ```ts
+import { createClient } from '@supabase/supabase-js'
+
+const geobase = createClient(
+  process.env.GEOBASE_PROJECT_URL!,
+  process.env.GEOBASE_ANON_KEY!,
+  { db: { schema: 'geoembeddings' } },
+)
+
 const { data, error } = await geobase.rpc('similarity_search', {
   table_name: 'your_embeddings_table',
   patch_id: 1,
 })
 ```
 
+Full overload table, defaults, and change detection: [RPC API guide](/guides/geoembeddings/rpc-api).
