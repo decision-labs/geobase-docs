@@ -1,13 +1,15 @@
-import { Callout } from 'nextra/components'
+# GeoEmbeddings
 
-# GeoEmbeddings (placeholder)
+Embeddings tables live in the project `geoembeddings` schema (catalogue + patch vectors). Use the right integration path for the job:
 
-<Callout type="warning" emoji="⏳">
-  Full API and tutorial content is coming soon.
-</Callout>
+| Path | Use when | Docs |
+| --- | --- | --- |
+| **RPC** | Interactive similarity / change detection against Postgres | [RPC API](/guides/geoembeddings/rpc-api) |
+| **Worker jobs** | Create embeddings from GeoTIFF or SRAI (async) | [Worker jobs](/reference/worker-jobs) · [SRAI pipeline](/guides/srai/automated_srai_pipeline) |
+| **GeoParquet** | Bulk analytics on exported files in Storage | [Connect to GeoParquet](/ai/geoembeddings/geoparquet) |
 
 ## Guides
 
-- [RPC API (placeholder)](/ai/geoembeddings/rpc-api)
-- [Connect to GeoParquet (placeholder)](/ai/geoembeddings/geoparquet)
-
+- [RPC API](/guides/geoembeddings/rpc-api)
+- [Connect to GeoParquet](/ai/geoembeddings/geoparquet)
+- [Worker API](/reference/worker-api)

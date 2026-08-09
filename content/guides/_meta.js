@@ -4,5 +4,6 @@ export default {
 	"gis-analyst": "GIS Analyst",
 	integrations: "Integrations",
 	"software-developer": "Software Developer",
+	geoembeddings: "GeoEmbeddings",
 	srai: "SRAI",
 };

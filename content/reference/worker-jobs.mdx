@@ -1,26 +1,6 @@
 # Worker jobs
 
-Use this page with [Global Geobase context](/reference/geobase-context).
-
-## What this service is
-
-Worker jobs are task-specific endpoints under the project worker API.
-
-## When an agent should use it in a Next.js app
-
-Use for asynchronous actions that should not block request-response cycles.
-
-## Base URL from CLI output
-
-- `{origin}/worker/jobs/osmImportArea`
-- `{origin}/worker/jobs/overtureImportArea`
-- `{origin}/worker/jobs/createGeoEmbeddings`
-- `{origin}/worker/jobs/createSraiEmbeddings`
-- `{origin}/worker/jobs/archiveToPmtiles`
-
-## Auth required
-
-Use server-side credentials only; do not call these directly from browser code.
+Use this page with [Global Geobase context](/reference/geobase-context) and [Worker API](/reference/worker-api) (base URL + auth).
 
 ## Job quick reference
 
@@ -28,31 +8,57 @@ Use server-side credentials only; do not call these directly from browser code.
 |-----|---------|-------|
 | `osmImportArea` | OpenStreetMap extract → project tables | [OpenStreetMap import](/importing-data/sources/osm) |
 | `overtureImportArea` | Overture Maps layers → `{prefix}_{suffix}` tables | [Overture import](/importing-data/sources/overture) |
-| `createGeoEmbeddings` | GeoAI / GeoTIFF embeddings | [GeoEmbeddings](/ai/geoembeddings/geoparquet) |
-| `createSraiEmbeddings` | SRAI OSM + H3 embeddings | [Automated SRAI pipeline](/guides/srai/automated_srai_pipeline) |
+| `ogr2ogrImport` | File URL → Postgres via ogr2ogr | Worker OpenAPI `/doc` |
+| `createGeoEmbeddings` | GeoTIFF → `geoembeddings.*` | [RPC API](/guides/geoembeddings/rpc-api) (query after) · [GeoParquet](/ai/geoembeddings/geoparquet) |
+| `createSraiEmbeddings` | SRAI OSM + H3 → `geoembeddings.*` | [Automated SRAI pipeline](/guides/srai/automated_srai_pipeline) |
 | `archiveToPmtiles` | PostGIS table → Storage `pmtiles/{table}.pmtiles` | [Archive to PMTiles](/guides/gis-analyst/archive-to-pmtiles) |
 
-Cancel pending/running jobs with `DELETE {origin}/worker/jobs/{taskName}/{job_id}` (Studio: `DELETE /api/projects/{ref}/jobs/{taskName}/{job_id}`).
+Cancel: `DELETE {WORKER_BASE_URL}/jobs/{taskName}/{job_id}` (Studio: `DELETE /api/projects/{ref}/jobs/{taskName}/{job_id}`).
 
-## Minimal request example
+## `createGeoEmbeddings`
+
+| Field | Required | Notes |
+| --- | --- | --- |
+| `geotiffPath` | yes | HTTPS (or worker-reachable) GeoTIFF / COG path |
+| `tableName` | yes | PostgreSQL identifier → `geoembeddings.{tableName}` |
+| `normalizeEmbeddings` | no | default `true` |
+| `tileSize` | no | default `256` |
+| `modelName` | no | default `dinov3-vitl16-pretrain-sat493m` |
+| `bands` | no | band indices |
+| `uploadArtifactsToStorage` | no | default `false`; GeoParquet (+ metadata) to Storage |
+| `projectTarget` | shared pool | include `projectRef` (and DB/service credentials as required by the pool) |
+
+Fleet size guards (fail before ONNX): `GEOEMBEDDINGS_MAX_TILES` (default `10000`), `GEOEMBEDDINGS_MAX_GEOTIFF_BYTES` (default 100 MiB); `0` disables.
 
 ```bash
-curl -X POST "${GEOBASE_PROJECT_URL}/worker/jobs/createGeoEmbeddings" \
+curl -sS -X POST "${WORKER_BASE_URL}/jobs/createGeoEmbeddings" \
   -H "apikey: ${GEOBASE_SERVICE_ROLE_KEY}" \
   -H "Authorization: Bearer ${GEOBASE_SERVICE_ROLE_KEY}" \
   -H "Content-Type: application/json" \
-  -d '{}'
+  -d '{
+    "geotiffPath": "https://example.com/scene.tif",
+    "tableName": "my_embeddings",
+    "tileSize": 256,
+    "uploadArtifactsToStorage": true
+  }'
 ```
 
-For map imports, see [OpenStreetMap](/importing-data/sources/osm) and [Overture](/importing-data/sources/overture) (require `areaName`, `aoiGeoJson`, plus `topics` or `types`).
+After success, query with [RPC API](/guides/geoembeddings/rpc-api) or download artifacts via [Connect to GeoParquet](/ai/geoembeddings/geoparquet).
 
-For table archives, see [Archive to PMTiles](/guides/gis-analyst/archive-to-pmtiles) (requires `{ "table": "…" }` and a Storage bucket named `pmtiles`).
+## `createSraiEmbeddings`
+
+See [Automated SRAI pipeline](/guides/srai/automated_srai_pipeline) for `tableName`, `h3Resolution`, `placeQuery` / `aoiGeoJson`, tags/presets, and Studio UI.
+
+## Imports and archive
+
+- OSM / Overture: require AOI fields (`areaName`, `aoiGeoJson`, plus `topics` or `types` for Overture) — see import guides.
+- `archiveToPmtiles`: body `{ "table": "…" }` (optional `schema`, zooms); Storage bucket `pmtiles` must exist.
 
 ## Human checkpoint
 
-Verify payload schema and expected job status lifecycle before wiring UI polling.
+Poll job status until `success` / `failed` before wiring UI; validate payloads against `{WORKER_BASE_URL}/doc`.
 
 ## Links
 
-- [Project services hub](/reference/project-services#worker-archive-to-pmtiles)
 - [Worker API](/reference/worker-api)
+- [Project services hub](/reference/project-services#worker-api-openapi)

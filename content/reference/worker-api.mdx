@@ -4,31 +4,65 @@ Use this page with [Global Geobase context](/reference/geobase-context).
 
 ## What this service is
 
-Worker API exposes project background job endpoints and OpenAPI docs.
+HTTP API for **background jobs** (imports, embeddings, archives). OpenAPI lives at `{worker_base}/doc`.
 
-## When an agent should use it in a Next.js app
+This is **not** the [GeoEmbeddings RPC API](/guides/geoembeddings/rpc-api) (PostgREST search). Worker jobs *write* embeddings and other data; RPC *queries* them afterward.
 
-Use when work should run asynchronously (imports, embeddings, long-running pipelines).
+## Base URL
 
-## Base URL from CLI output
+| Environment | Typical base |
+| --- | --- |
+| Shared production pool | `https://services.geobase.app/worker` |
+| Shared staging pool | `https://services.staging.geobase.app/worker` |
+| Local worker | `http://127.0.0.1:3333` (or `STUDIO_LOCAL_WORKER_URL`) |
 
-`{origin}/worker/doc` (OpenAPI docs entry point)
+Studio resolves the base via `STUDIO_LOCAL_WORKER_URL` → `STUDIO_SHARED_WORKER_URL` → env defaults (local in development, otherwise the shared pool). Per-project `{origin}/worker` is **retired for Studio** on staging/shared pools; CLI output may still show `{origin}/worker/…` for historical deep links — prefer the shared base when using org services.
 
-## Auth required
+## Auth
 
-Server-side credentials only for job creation or privileged worker operations.
+- **Server-side only** — never call job create/cancel from the browser with a service role key.
+- **Shared pool:** organization Services API key (`apikey` + `Authorization: Bearer …`) and scope every call to a project with `projectRef` (query on GET/DELETE; `projectTarget.projectRef` on POST bodies).
+- **Local worker:** often no Kong; use project service role as in examples below.
 
-## Minimal request example
+## Endpoints (shape)
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| `GET` | `/doc` | OpenAPI |
+| `POST` | `/jobs/{taskName}` | Enqueue |
+| `GET` | `/jobs/{taskName}` | List (`?projectRef=` on shared pool) |
+| `GET` | `/jobs/{taskName}/latest` | Latest job |
+| `GET` | `/jobs/{taskName}/{job_id}` | Status |
+| `DELETE` | `/jobs/{taskName}/{job_id}` | Cancel |
+
+Task names: see [Worker jobs](/reference/worker-jobs).
+
+## Minimal example
 
 ```bash
-curl "${GEOBASE_PROJECT_URL}/worker/doc"
+# Local or project-scoped worker
+curl -sS "${WORKER_BASE_URL}/doc"
+
+curl -sS -X POST "${WORKER_BASE_URL}/jobs/createGeoEmbeddings" \
+  -H "apikey: ${GEOBASE_SERVICE_ROLE_KEY}" \
+  -H "Authorization: Bearer ${GEOBASE_SERVICE_ROLE_KEY}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "geotiffPath": "https://example.com/scene.tif",
+    "tableName": "my_embeddings",
+    "uploadArtifactsToStorage": true
+  }'
 ```
+
+Studio also proxies jobs as `POST /api/projects/{ref}/jobs/{taskName}` (session auth). That control-plane route is not the worker OpenAPI host.
 
 ## Human checkpoint
 
-Verify the selected job endpoint exists in the project worker OpenAPI document.
+Confirm the task exists under `{WORKER_BASE_URL}/doc` and that auth matches shared-pool vs local.
 
 ## Links
 
-- [Project services hub](/reference/project-services#worker-api-openapi)
 - [Worker jobs](/reference/worker-jobs)
+- [Project services hub](/reference/project-services#worker-api-openapi)
+- [GeoEmbeddings RPC](/guides/geoembeddings/rpc-api)
+- [Automated SRAI pipeline](/guides/srai/automated_srai_pipeline)
