@@ -12,6 +12,7 @@ Use this page with [Global Geobase context](/reference/geobase-context) and [Wor
 | `createGeoEmbeddings` | GeoTIFF → `geoembeddings.*` | [RPC API](/guides/geoembeddings/rpc-api) (query after) · [GeoParquet](/ai/geoembeddings/geoparquet) |
 | `createSraiEmbeddings` | SRAI OSM + H3 → `geoembeddings.*` | [Automated SRAI pipeline](/guides/srai/automated_srai_pipeline) |
 | `archiveToPmtiles` | PostGIS table → Storage `pmtiles/{table}.pmtiles` | [Archive to PMTiles](/guides/gis-analyst/archive-to-pmtiles) |
+| `create3dTiles` | PostGIS 3D table → Storage `3dtiles/{table}/` (OGC 3D Tiles 1.1) | [Create 3D Tiles](/guides/gis-analyst/create-3d-tiles) |
 
 Cancel: `DELETE {WORKER_BASE_URL}/jobs/{taskName}/{job_id}` (Studio: `DELETE /api/projects/{ref}/jobs/{taskName}/{job_id}`).
 
@@ -53,6 +54,7 @@ See [Automated SRAI pipeline](/guides/srai/automated_srai_pipeline) for `tableNa
 
 - OSM / Overture: require AOI fields (`areaName`, `aoiGeoJson`, plus `topics` or `types` for Overture) — see import guides.
 - `archiveToPmtiles`: body `{ "table": "…" }` (optional `schema`, zooms); Storage bucket `pmtiles` must exist.
+- `create3dTiles`: body `{ "table": "…", "kind": "batched" }` (optional `schema`); Storage bucket `3dtiles` must exist. Lead path is pg2b3dm 2.27.0 for `PolygonZ` / `MultiPolygonZ` / `PolyhedralSurface` (3DBAG LoD1.2 and LoD2.2 use this same job). Instanced `POINT Z` is `kind: "instanced"`. Not MVT — see [Create 3D Tiles](/guides/gis-analyst/create-3d-tiles).
 
 ## Human checkpoint
 

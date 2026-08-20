@@ -2,6 +2,8 @@
 
 Geobase automatically generates vector tile endpoints for your spatial data, making it easy to visualize your geographic data on interactive web maps.
 
+**3D Tiles is not this service.** `create3dTiles` writes OGC 3D Tiles 1.1 to Storage bucket `3dtiles` — not MVT, not `{z}/{x}/{y}.pbf`. See [Create 3D Tiles](/guides/gis-analyst/create-3d-tiles).
+
 ## What are Vector Tiles?
 
 Vector tiles are packets of geographic data, delivered to a map in small chunks. Unlike raster tiles (regular map images), vector tiles contain the raw geometric data, enabling:
