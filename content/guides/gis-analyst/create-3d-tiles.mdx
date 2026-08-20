@@ -38,10 +38,10 @@ v1 is **not** a public CDN ([#851](https://github.com/decision-labs/geobase/issu
 
 | Header | Value |
 |--------|--------|
-| `apikey` | Project anon key or user JWT |
+| `apikey` | Session access token after use password login, or project anon key |
 | `Authorization` | `Bearer <same token>` |
 
-Never put **`service_role`** in browser code.
+Never put a **password** or **`service_role`** in browser code. Use password login, then pass the session access token.
 
 `tilesetUrl` looks like:
 
@@ -59,7 +59,8 @@ Never put **`service_role`** in browser code.
 <script>
 const PROJECT_URL = 'https://<project-ref>.geobase.app'
 const TILESET_URL = PROJECT_URL + '/storage/v1/object/3dtiles/andijk_panden/tileset.json'
-const TOKEN = '<USER_JWT_OR_ANON_KEY>'
+// Access token from use password login, or project anon key. Never a password or service_role.
+const TOKEN = '<SESSION_ACCESS_TOKEN_OR_ANON_KEY>'
 
 const viewer = new Cesium.Viewer('cesiumContainer', {
   terrainProvider: new Cesium.EllipsoidTerrainProvider(),
@@ -159,7 +160,7 @@ Shared-pool callers use `https://services.geobase.app/worker/jobs/create3dTiles`
 
 ## Human checkpoint
 
-Confirm the `3dtiles` bucket exists, the table is 3D, and it is small enough for fleet size guards. Viewers must send Storage auth on every tileset fetch.
+Confirm the `3dtiles` bucket exists, the table is 3D, and it is small enough for fleet size guards. Viewers must send Storage auth on every tileset fetch. Use password login, then pass the session access token — never a password in the Cesium snippet.
 
 ## Links
 
