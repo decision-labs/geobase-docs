@@ -54,7 +54,7 @@ See [Automated SRAI pipeline](/guides/srai/automated_srai_pipeline) for `tableNa
 
 - OSM / Overture: require AOI fields (`areaName`, `aoiGeoJson`, plus `topics` or `types` for Overture) — see import guides.
 - `archiveToPmtiles`: body `{ "table": "…" }` (optional `schema`, zooms); Storage bucket `pmtiles` must exist.
-- `create3dTiles`: body `{ "table": "…", "kind": "batched" }` (optional `schema`); Storage bucket `3dtiles` must exist. Lead path is pg2b3dm 2.27.0. Not MVT — see [Create 3D Tiles](/guides/gis-analyst/create-3d-tiles).
+- `create3dTiles`: body `{ "table": "…", "kind": "batched" }` (optional `schema`); Storage bucket `3dtiles` must exist. Lead path is pg2b3dm 2.27.0 for `PolygonZ` / `MultiPolygonZ` / `PolyhedralSurface` (3DBAG LoD1.2 and LoD2.2 use this same job). Instanced `POINT Z` is `kind: "instanced"`. Not MVT — see [Create 3D Tiles](/guides/gis-analyst/create-3d-tiles).
 
 ## Human checkpoint
 
